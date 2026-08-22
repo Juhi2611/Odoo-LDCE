@@ -15,7 +15,11 @@ import {
   FiHome, 
   FiUsers, 
   FiGlobe,
-  FiMap
+  FiMap,
+  FiFileText,
+  FiShield,
+  FiLock,
+  FiCheckCircle
 } from 'react-icons/fi';
 import { MdFlight } from 'react-icons/md';
 import styles from './Navbar.module.css';
@@ -25,6 +29,7 @@ export default function Navbar({ transparent = false }) {
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [legalModal, setLegalModal] = useState(null); // 'terms' | 'privacy' | 'security' | null
   const pathname = usePathname();
   const router = useRouter();
 
@@ -161,7 +166,7 @@ export default function Navbar({ transparent = false }) {
           <button 
             className={styles.menuCircleBtn} 
             onClick={() => setDrawerOpen(true)}
-            title="Open Quick Menu"
+            title="Open Navigation Menu"
           >
             <FiMenu />
           </button>
@@ -175,7 +180,7 @@ export default function Navbar({ transparent = false }) {
             <div className={styles.logoBadge} style={{ width: '32px', height: '32px' }}>
               <MdFlight style={{ fontSize: '1rem' }} />
             </div>
-            <strong>GlobeTrotter Menu</strong>
+            <strong>Navigation & Hub</strong>
           </div>
           <button className={styles.drawerCloseBtn} onClick={() => setDrawerOpen(false)}>
             <FiX />
@@ -203,6 +208,7 @@ export default function Navbar({ transparent = false }) {
         )}
 
         <div className={styles.drawerLinks}>
+          <div className={styles.drawerSectionTitle}>Main Pages</div>
           <Link href="/dashboard" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
             <FiHome /> Dashboard
           </Link>
@@ -222,7 +228,7 @@ export default function Navbar({ transparent = false }) {
             <FiBarChart2 /> Live Analytics
           </Link>
 
-          <div style={{ marginTop: '16px', padding: '0 8px' }}>
+          <div style={{ marginTop: '12px', padding: '0 4px' }}>
             <Link 
               href="/trips/create" 
               className="btn btn-primary" 
@@ -232,6 +238,30 @@ export default function Navbar({ transparent = false }) {
               <FiPlusCircle /> Plan New Trip
             </Link>
           </div>
+
+          {/* ── Legal & Policies Section in Sidebar ── */}
+          <div className={styles.drawerSectionTitle} style={{ marginTop: '20px' }}>Legal & Security</div>
+          <button 
+            type="button" 
+            className={styles.drawerLink}
+            onClick={() => { setLegalModal('terms'); setDrawerOpen(false); }}
+          >
+            <FiFileText /> Terms of Service
+          </button>
+          <button 
+            type="button" 
+            className={styles.drawerLink}
+            onClick={() => { setLegalModal('privacy'); setDrawerOpen(false); }}
+          >
+            <FiLock /> Privacy Policy
+          </button>
+          <button 
+            type="button" 
+            className={styles.drawerLink}
+            onClick={() => { setLegalModal('security'); setDrawerOpen(false); }}
+          >
+            <FiShield /> Security & Data
+          </button>
 
           {user ? (
             <div style={{ marginTop: '16px', borderTop: '1px solid var(--color-cream-dark)', paddingTop: '12px' }}>
@@ -253,6 +283,64 @@ export default function Navbar({ transparent = false }) {
       </div>
 
       {drawerOpen && <div className={styles.overlay} onClick={() => setDrawerOpen(false)} />}
+
+      {/* ── Legal & Security Modal ── */}
+      {legalModal && (
+        <div className="modal-overlay" onClick={() => setLegalModal(null)}>
+          <div className="modal-content animate-scale-in" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '580px', maxHeight: '85vh', overflowY: 'auto' }}>
+            <div className="modal-header">
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {legalModal === 'terms' && <><FiFileText style={{ color: 'var(--color-forest)' }} /> Terms of Service</>}
+                {legalModal === 'privacy' && <><FiLock style={{ color: 'var(--color-forest)' }} /> Privacy Policy</>}
+                {legalModal === 'security' && <><FiShield style={{ color: 'var(--color-forest)' }} /> Security & Data Protection</>}
+              </h3>
+              <button className="modal-close" onClick={() => setLegalModal(null)}>×</button>
+            </div>
+
+            <div style={{ padding: '8px 0', fontSize: '0.9rem', color: 'var(--color-charcoal)', lineHeight: '1.7' }}>
+              {legalModal === 'terms' && (
+                <>
+                  <p><strong>Effective Date:</strong> January 2026</p>
+                  <p>Welcome to <strong>GlobeTrotter</strong>. By creating an account or accessing our services, you agree to comply with our Terms of Service.</p>
+                  <h4 style={{ marginTop: '14px', marginBottom: '6px', fontSize: '0.95rem' }}>1. Platform Usage</h4>
+                  <p>GlobeTrotter provides multi-city travel itinerary planning, real-time budgeting tools, and community itinerary sharing. Users are responsible for maintaining the confidentiality of their credentials.</p>
+                  <h4 style={{ marginTop: '14px', marginBottom: '6px', fontSize: '0.95rem' }}>2. Public Itineraries & Content</h4>
+                  <p>When you publish an itinerary publicly, you grant other travelers permission to view and clone your route details. Personal financial notes and sensitive data remain strictly private.</p>
+                </>
+              )}
+
+              {legalModal === 'privacy' && (
+                <>
+                  <p><strong>Effective Date:</strong> January 2026</p>
+                  <p>Your privacy is paramount. GlobeTrotter protects your personal information with modern encryption and strict data minimization.</p>
+                  <h4 style={{ marginTop: '14px', marginBottom: '6px', fontSize: '0.95rem' }}>1. Information We Collect</h4>
+                  <p>We collect your account name, email address, custom travel itineraries, and saved destinations to provide a personalized experience.</p>
+                  <h4 style={{ marginTop: '14px', marginBottom: '6px', fontSize: '0.95rem' }}>2. Data Ownership</h4>
+                  <p>You retain 100% ownership of your itineraries and profile. You may export or permanently delete your account and all associated records at any time in Profile Settings.</p>
+                </>
+              )}
+
+              {legalModal === 'security' && (
+                <>
+                  <p><strong>Security Architecture:</strong> Enterprise Grade</p>
+                  <p>GlobeTrotter utilizes cloud database isolation, encrypted JWT authentication, and secure HTTPS transmission across all endpoints.</p>
+                  <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
+                    <li>End-to-end SSL/TLS 256-bit encrypted data in transit</li>
+                    <li>Secure tokenized identity and deterministic user isolation</li>
+                    <li>Zero unencrypted credential storage</li>
+                  </ul>
+                </>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--color-cream-dark)' }}>
+              <button className="btn btn-primary btn-sm" onClick={() => setLegalModal(null)}>
+                <FiCheckCircle /> Understood & Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

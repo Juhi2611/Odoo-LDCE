@@ -1,23 +1,23 @@
 .footer {
   background: var(--color-charcoal, #1a1a1a);
   color: rgba(255, 255, 255, 0.7);
-  padding: 60px 0 28px;
+  padding: 50px 0 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-family: var(--font-sans);
 }
 
 .footerTop {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 40px;
-  padding-bottom: 48px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 60px;
+  padding-bottom: 36px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .brandCol {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .logo {
@@ -60,21 +60,7 @@
   font-size: 0.88rem;
   color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
-  max-width: 360px;
-}
-
-.hackathonBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #ffffff;
-  width: fit-content;
+  max-width: 440px;
 }
 
 .linksCol h4 {
@@ -86,75 +72,48 @@
   letter-spacing: 0.3px;
 }
 
-.linksCol ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.platformLinks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-.linksCol ul li a,
-.legalLink {
+.footerLink {
   color: rgba(255, 255, 255, 0.65);
   text-decoration: none;
   font-size: 0.85rem;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.linksCol ul li a:hover,
-.legalLink:hover {
+.footerLink:hover {
   color: var(--color-gold, #D4AF37);
   transform: translateX(3px);
 }
 
 .footerBottom {
-  padding-top: 28px;
+  padding-top: 24px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
 }
 
 .copyText {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  margin: 0;
 }
 
-.teamAttribution {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.7);
-  flex-wrap: wrap;
-}
-
-.teamAttribution strong {
-  color: #ffffff;
-  font-weight: 600;
-}
-
-@media (max-width: 900px) {
-  .footerTop {
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-  }
-}
-
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .footerTop {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 32px;
   }
-  .footerBottom {
-    flex-direction: column;
-    align-items: flex-start;
+  .platformLinks {
+    grid-template-columns: 1fr;
   }
 }
