@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-odoo--ldce.vercel.app-2ecc71?style=for-the-badge&logo=vercel)](https://odoo-ldce-ashy.vercel.app)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-globetrotter--travel.vercel.app-2ecc71?style=for-the-badge&logo=vercel)](https://globetrotter-travel.vercel.app)
 ![Next.js](https://img.shields.io/badge/Next.js%2016-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
@@ -12,7 +12,7 @@
 
 **An intelligent, multi-city travel planning platform combining 3D spatial visualization, real-time satellite geocoding, day-by-day itinerary orchestration, and dynamic budget analytics.**
 
-[🚀 Explore Live Demo](https://odoo-ldce-ashy.vercel.app) • [✨ Key Features](#-key-features) • [🛠️ Tech Stack](#-modern-tech-stack) • [🗄️ Database Architecture](#-database-architecture) • [⚡ Getting Started](#-getting-started)
+[🚀 Explore Live Demo](https://globetrotter-travel.vercel.app) • [✨ Key Features](#-key-features) • [🛠️ Tech Stack](#-modern-tech-stack) • [🗄️ Database Architecture](#-database-architecture) • [⚡ Getting Started](#-getting-started)
 
 </div>
 
@@ -170,7 +170,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 GlobeTrotter is deployed live and globally accessible:
 
-🔗 **Production URL**: **[https://odoo-ldce-ashy.vercel.app](https://odoo-ldce-ashy.vercel.app)**
+🔗 **Production URL**: **[https://globetrotter-travel.vercel.app](https://globetrotter-travel.vercel.app)**
 
 ### Continuous Deployment on Vercel:
 1. Every commit pushed to `main` automatically triggers an optimized Next.js build.
