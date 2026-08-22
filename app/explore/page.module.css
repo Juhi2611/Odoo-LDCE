@@ -28,7 +28,43 @@
 .cityImageWrap { position: relative; aspect-ratio: 3/4; overflow: hidden; }
 .cityImageWrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 .cityCard:hover .cityImageWrap img { transform: scale(1.06); }
-.cityBadge { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 4px; padding: 6px 12px; background: white; border-radius: var(--radius-full); font-size: 0.72rem; font-weight: 500; box-shadow: var(--shadow-sm); }
+.cityBadge { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 4px; padding: 6px 12px; background: white; border-radius: var(--radius-full); font-size: 0.72rem; font-weight: 500; box-shadow: var(--shadow-sm); z-index: 2; }
+
+.heartBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-slate);
+  font-size: 1.05rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all var(--transition-fast);
+  z-index: 3;
+}
+
+.heartBtn:hover {
+  transform: scale(1.15);
+  background: #ffffff;
+  color: #E63946;
+}
+
+.heartActive {
+  background: #ffffff;
+  color: #E63946 !important;
+}
+
+.heartActive svg {
+  fill: #E63946;
+}
 .cityOverlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 16px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
 .cityOverlay h3 { font-family: var(--font-serif); font-size: 1.2rem; color: white; margin-bottom: 4px; }
 .cityOverlay p { font-size: 0.78rem; color: rgba(255,255,255,0.8); line-height: 1.4; margin-bottom: 8px; }

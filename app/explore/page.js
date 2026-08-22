@@ -2,9 +2,9 @@
 import { useState, useEffect, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import { ToastProvider, useToast } from '@/components/Toast';
-import { getCurrentUser, searchCities, searchActivities, getCityActivities, getCity, CITIES, getUserTrips, addStop, addTripActivity, addCustomCity, getAllCities, getCostTierLabel } from '@/lib/data';
+import { getCurrentUser, searchCities, searchActivities, getCityActivities, getCity, CITIES, getUserTrips, addStop, addTripActivity, addCustomCity, getAllCities, getCostTierLabel, getSavedCityIds, toggleSavedCity } from '@/lib/data';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FiSearch, FiMapPin, FiStar, FiDollarSign, FiClock, FiFilter, FiX, FiGlobe, FiCompass, FiPlus, FiCheck, FiLoader, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
+import { FiSearch, FiMapPin, FiStar, FiDollarSign, FiClock, FiFilter, FiX, FiGlobe, FiCompass, FiPlus, FiCheck, FiLoader, FiAlertTriangle, FiCheckCircle, FiHeart } from 'react-icons/fi';
 import styles from './page.module.css';
 
 function ExploreContent() {
@@ -17,6 +17,7 @@ function ExploreContent() {
   const [sortBy, setSortBy] = useState('popularity');
   const [selectedCity, setSelectedCity] = useState(null);
   const [userTrips, setUserTrips] = useState([]);
+  const [savedCityIds, setSavedCityIds] = useState([]);
   const [showAddToTripModal, setShowAddToTripModal] = useState(null); // { type: 'city' | 'activity', item }
   const [isVerifyingLocation, setIsVerifyingLocation] = useState(false);
   const [verifiedLocation, setVerifiedLocation] = useState(null);
@@ -25,6 +26,22 @@ function ExploreContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const addToast = useToast();
+
+  const syncSaved = () => {
+    setSavedCityIds(getSavedCityIds());
+  };
+
+  useEffect(() => {
+    syncSaved();
+    window.addEventListener('storage', syncSaved);
+    return () => window.removeEventListener('storage', syncSaved);
+  }, []);
+
+  const handleToggleHeart = (cityId, cityName) => {
+    const res = toggleSavedCity(cityId);
+    setSavedCityIds(res.saved_city_ids);
+    addToast(res.saved ? `❤️ Saved ${cityName} to favorites!` : `Removed ${cityName} from favorites`, 'info');
+  };
 
   useEffect(() => {
     const u = getCurrentUser();
@@ -239,6 +256,20 @@ function ExploreContent() {
                       onError={(e) => { e.target.src = '/images/destinations/paris.jpg'; }}
                     />
                     <div className={styles.cityBadge}><FiMapPin /> {city.country}</div>
+                    
+                    {/* Heart / Save Destination Button */}
+                    <button
+                      type="button"
+                      className={`${styles.heartBtn} ${savedCityIds.includes(city.id) ? styles.heartActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleHeart(city.id, city.name);
+                      }}
+                      title={savedCityIds.includes(city.id) ? 'Remove from saved destinations' : 'Save to favorite destinations'}
+                    >
+                      <FiHeart />
+                    </button>
+
                     <div className={styles.cityOverlay}>
                       <h3>{city.name}</h3>
                       <p>{city.description.substring(0, 90)}...</p>

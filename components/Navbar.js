@@ -3,14 +3,27 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { getCurrentUser, logoutUser } from '@/lib/data';
-import { FiMenu, FiX, FiUser, FiLogOut, FiMapPin, FiCompass, FiPlusCircle, FiBarChart2, FiHome, FiUsers, FiMail } from 'react-icons/fi';
+import { 
+  FiMenu, 
+  FiX, 
+  FiUser, 
+  FiLogOut, 
+  FiMapPin, 
+  FiCompass, 
+  FiPlusCircle, 
+  FiBarChart2, 
+  FiHome, 
+  FiUsers, 
+  FiGlobe,
+  FiMap
+} from 'react-icons/fi';
 import { MdFlight } from 'react-icons/md';
 import styles from './Navbar.module.css';
 
 export default function Navbar({ transparent = false }) {
   const [user, setUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -32,6 +45,7 @@ export default function Navbar({ transparent = false }) {
     logoutUser();
     setUser(null);
     setProfileOpen(false);
+    setDrawerOpen(false);
     router.push('/');
   };
 
@@ -58,17 +72,12 @@ export default function Navbar({ transparent = false }) {
           </div>
         </Link>
 
-        {/* Center Nav Links */}
-        <div className={`${styles.navLinks} ${mobileOpen ? styles.mobileOpen : ''}`}>
-          <button className={styles.mobileClose} onClick={() => setMobileOpen(false)}>
-            <FiX />
-          </button>
-
+        {/* Center Nav Links (Desktop) */}
+        <div className={styles.navLinks}>
           {user && (
             <Link
               href="/dashboard"
               className={`${styles.navLink} ${pathname === '/dashboard' ? styles.active : ''}`}
-              onClick={() => setMobileOpen(false)}
             >
               Dashboard
             </Link>
@@ -79,7 +88,6 @@ export default function Navbar({ transparent = false }) {
               key={link.label}
               href={link.href}
               className={`${styles.navLink} ${pathname === link.href ? styles.active : ''}`}
-              onClick={() => setMobileOpen(false)}
             >
               {link.label}
             </Link>
@@ -94,47 +102,48 @@ export default function Navbar({ transparent = false }) {
                 <FiPlusCircle /> Plan Trip
               </Link>
               <div className={styles.profileWrapper}>
-              <button
-                className={styles.profileBtn}
-                onClick={() => setProfileOpen(!profileOpen)}
-              >
-                <div className={styles.avatar}>
-                  {user.avatar_url ? (
-                    <img 
-                      src={user.avatar_url} 
-                      alt={user.name} 
-                      style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
-                    />
-                  ) : (
-                    user.name?.charAt(0).toUpperCase()
-                  )}
-                </div>
-              </button>
-              {profileOpen && (
-                <div className={styles.profileDropdown}>
-                  <div className={styles.dropdownHeader}>
-                    <strong>{user.name}</strong>
-                    <span>{user.email}</span>
+                <button
+                  className={styles.profileBtn}
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  title="Your Profile"
+                >
+                  <div className={styles.avatar}>
+                    {user.avatar_url ? (
+                      <img 
+                        src={user.avatar_url} 
+                        alt={user.name} 
+                        style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                      />
+                    ) : (
+                      user.name?.charAt(0).toUpperCase()
+                    )}
                   </div>
-                  <hr className={styles.dropdownDivider} />
-                  <Link href="/dashboard" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
-                    <FiHome /> Dashboard
-                  </Link>
-                  <Link href="/trips" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
-                    <FiCompass /> My Trips
-                  </Link>
-                  <Link href="/profile" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
-                    <FiUser /> Profile & Settings
-                  </Link>
-                  <Link href="/admin" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
-                    <FiBarChart2 /> Analytics
-                  </Link>
-                  <hr className={styles.dropdownDivider} />
-                  <button onClick={handleLogout} className={styles.dropdownItem}>
-                    <FiLogOut /> Log Out
-                  </button>
-                </div>
-              )}
+                </button>
+                {profileOpen && (
+                  <div className={styles.profileDropdown}>
+                    <div className={styles.dropdownHeader}>
+                      <strong>{user.name}</strong>
+                      <span>{user.email}</span>
+                    </div>
+                    <hr className={styles.dropdownDivider} />
+                    <Link href="/dashboard" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
+                      <FiHome /> Dashboard
+                    </Link>
+                    <Link href="/trips" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
+                      <FiCompass /> My Trips
+                    </Link>
+                    <Link href="/profile" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
+                      <FiUser /> Profile & Settings
+                    </Link>
+                    <Link href="/admin" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
+                      <FiBarChart2 /> Analytics
+                    </Link>
+                    <hr className={styles.dropdownDivider} />
+                    <button onClick={handleLogout} className={styles.dropdownItem}>
+                      <FiLogOut /> Log Out
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           ) : (
@@ -148,14 +157,102 @@ export default function Navbar({ transparent = false }) {
             </div>
           )}
 
-          {/* Circle Hamburger Button */}
-          <button className={styles.menuCircleBtn} onClick={() => setMobileOpen(!mobileOpen)}>
+          {/* Quick Menu Drawer Button */}
+          <button 
+            className={styles.menuCircleBtn} 
+            onClick={() => setDrawerOpen(true)}
+            title="Open Quick Menu"
+          >
             <FiMenu />
           </button>
         </div>
       </div>
 
-      {mobileOpen && <div className={styles.overlay} onClick={() => setMobileOpen(false)} />}
+      {/* ── Slide-Out Quick Navigation Drawer ── */}
+      <div className={`${styles.quickDrawer} ${drawerOpen ? styles.drawerOpen : ''}`}>
+        <div className={styles.drawerHeader}>
+          <div className={styles.drawerLogo}>
+            <div className={styles.logoBadge} style={{ width: '32px', height: '32px' }}>
+              <MdFlight style={{ fontSize: '1rem' }} />
+            </div>
+            <strong>GlobeTrotter Menu</strong>
+          </div>
+          <button className={styles.drawerCloseBtn} onClick={() => setDrawerOpen(false)}>
+            <FiX />
+          </button>
+        </div>
+
+        {user && (
+          <div className={styles.drawerUserBox}>
+            <div className={styles.avatar} style={{ width: '48px', height: '48px', fontSize: '1.2rem' }}>
+              {user.avatar_url ? (
+                <img 
+                  src={user.avatar_url} 
+                  alt={user.name} 
+                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                />
+              ) : (
+                user.name?.charAt(0).toUpperCase()
+              )}
+            </div>
+            <div>
+              <strong style={{ display: 'block', fontSize: '0.95rem' }}>{user.name}</strong>
+              <span style={{ fontSize: '0.8rem', color: 'var(--color-slate)' }}>{user.email}</span>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.drawerLinks}>
+          <Link href="/dashboard" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
+            <FiHome /> Dashboard
+          </Link>
+          <Link href="/explore" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
+            <FiCompass /> Explore Destinations
+          </Link>
+          <Link href="/community" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
+            <FiUsers /> Community Feed
+          </Link>
+          <Link href="/trips" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
+            <FiMap /> My Itineraries
+          </Link>
+          <Link href="/profile" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
+            <FiUser /> Profile & Saved Spots
+          </Link>
+          <Link href="/admin" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
+            <FiBarChart2 /> Live Analytics
+          </Link>
+
+          <div style={{ marginTop: '16px', padding: '0 8px' }}>
+            <Link 
+              href="/trips/create" 
+              className="btn btn-primary" 
+              style={{ width: '100%', justifyContent: 'center', gap: '8px' }}
+              onClick={() => setDrawerOpen(false)}
+            >
+              <FiPlusCircle /> Plan New Trip
+            </Link>
+          </div>
+
+          {user ? (
+            <div style={{ marginTop: '16px', borderTop: '1px solid var(--color-cream-dark)', paddingTop: '12px' }}>
+              <button onClick={handleLogout} className={styles.drawerLink} style={{ color: 'var(--color-danger)' }}>
+                <FiLogOut /> Log Out
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px', borderTop: '1px solid var(--color-cream-dark)', paddingTop: '16px' }}>
+              <Link href="/auth/login" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setDrawerOpen(false)}>
+                Sign In
+              </Link>
+              <Link href="/auth/signup" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setDrawerOpen(false)}>
+                Create Account
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {drawerOpen && <div className={styles.overlay} onClick={() => setDrawerOpen(false)} />}
     </nav>
   );
 }

@@ -1,10 +1,11 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { ToastProvider, useToast } from '@/components/Toast';
-import { getCurrentUser, updateUser, logoutUser, getUserTrips, CITIES, getCity } from '@/lib/data';
-import { FiUser, FiMail, FiMapPin, FiGlobe, FiSave, FiLogOut, FiTrash2, FiCamera, FiMap, FiCalendar, FiStar, FiHeart, FiUpload, FiX, FiCheck } from 'react-icons/fi';
+import { getCurrentUser, updateUser, logoutUser, getUserTrips, CITIES, getCity, getSavedCityIds } from '@/lib/data';
+import { FiUser, FiMail, FiMapPin, FiGlobe, FiSave, FiLogOut, FiTrash2, FiCamera, FiMap, FiCalendar, FiStar, FiHeart, FiUpload, FiX, FiCheck, FiCompass } from 'react-icons/fi';
 import styles from './page.module.css';
 
 const PRESET_AVATARS = [
@@ -21,15 +22,23 @@ function ProfileContent() {
   const [editing, setEditing] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [savedCityIds, setSavedCityIds] = useState([]);
   const fileInputRef = useRef(null);
   const router = useRouter();
   const addToast = useToast();
 
-  useEffect(() => {
+  const syncData = () => {
     const u = getCurrentUser();
     if (!u) { router.push('/auth/login'); return; }
     setUser(u);
     setForm({ name: u.name || '', email: u.email || '', city: u.city || '', country: u.country || '' });
+    setSavedCityIds(u.saved_city_ids || []);
+  };
+
+  useEffect(() => {
+    syncData();
+    window.addEventListener('storage', syncData);
+    return () => window.removeEventListener('storage', syncData);
   }, [router]);
 
   if (!user) return null;
@@ -37,7 +46,7 @@ function ProfileContent() {
   const trips = getUserTrips(user.id);
   const totalCities = [...new Set(trips.flatMap(t => (t.stops || []).map(s => s.city_id)))];
   const totalCountries = [...new Set(totalCities.map(id => getCity(id)?.country).filter(Boolean))];
-  const savedCities = CITIES.slice(0, 6);
+  const savedCities = savedCityIds.map(id => getCity(id)).filter(Boolean);
 
   const handleSave = () => {
     const result = updateUser(form);
@@ -45,7 +54,6 @@ function ProfileContent() {
       setUser(result.user);
       setEditing(false);
       addToast('Profile updated successfully!', 'success');
-      // Trigger storage event so Navbar updates
       window.dispatchEvent(new Event('storage'));
     }
   };
@@ -98,7 +106,6 @@ function ProfileContent() {
     if (typeof window !== 'undefined') {
       localStorage.clear();
     }
-    addToast('Account deleted', 'info');
     router.push('/');
   };
 
@@ -148,7 +155,7 @@ function ProfileContent() {
               </button>
             </div>
 
-            {/* Settings */}
+            {/* Settings & Saved Destinations */}
             <div className={styles.settingsSection}>
               <div className={styles.settingsCard}>
                 <div className={styles.cardHeader}>
@@ -162,7 +169,7 @@ function ProfileContent() {
                   </div>
                   <div className="form-group">
                     <label className="form-label">Email</label>
-                    <input type="email" className="form-input" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} disabled={!editing} />
+                    <input type="email" className="form-input" value={form.email} disabled />
                   </div>
                   <div className="form-group">
                     <label className="form-label">City</label>
@@ -183,22 +190,43 @@ function ProfileContent() {
 
               {/* Saved Destinations */}
               <div className={styles.settingsCard}>
-                <h3><FiHeart /> Saved Destinations</h3>
-                <div className={styles.savedGrid}>
-                  {savedCities.map(city => (
-                    <div key={city.id} className={styles.savedCity}>
-                      <img 
-                        src={city.image_url} 
-                        alt={city.name} 
-                        onError={(e) => { e.target.src = '/images/destinations/paris.jpg'; }}
-                      />
-                      <div>
-                        <strong>{city.name}</strong>
-                        <span>{city.country}</span>
-                      </div>
-                    </div>
-                  ))}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <h3 style={{ margin: 0 }}><FiHeart style={{ color: '#E63946' }} /> Saved Destinations ({savedCities.length})</h3>
+                  <Link href="/explore" className="btn btn-secondary btn-sm" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+                    <FiCompass /> Explore More
+                  </Link>
                 </div>
+
+                {savedCities.length > 0 ? (
+                  <div className={styles.savedGrid}>
+                    {savedCities.map(city => (
+                      <Link href="/explore" key={city.id} className={styles.savedCity}>
+                        <img 
+                          src={city.image_url} 
+                          alt={city.name} 
+                          onError={(e) => { e.target.src = '/images/destinations/paris.jpg'; }}
+                        />
+                        <div>
+                          <strong>{city.name}</strong>
+                          <span>{city.country}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '36px 20px', background: 'var(--color-cream-light, #FAF7F2)', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--color-cream-dark)' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🤍</div>
+                    <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600, color: 'var(--color-charcoal)', marginBottom: '6px' }}>
+                      No Saved Destinations Yet
+                    </h4>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--color-slate)', maxWidth: '400px', margin: '0 auto 16px' }}>
+                      Discover destinations on the Explore page and click the heart icon on any city card to save your dream spots here.
+                    </p>
+                    <Link href="/explore" className="btn btn-primary btn-sm">
+                      <FiCompass /> Discover Destinations
+                    </Link>
+                  </div>
+                )}
               </div>
 
               {/* Danger Zone */}
@@ -282,15 +310,18 @@ function ProfileContent() {
         </div>
       )}
 
-      {/* ── Delete Modal ── */}
+      {/* Delete Account Modal */}
       {showDelete && (
         <div className="modal-overlay" onClick={() => setShowDelete(false)}>
-          <div className="modal-content animate-scale-in" onClick={e => e.stopPropagation()}>
-            <div className="modal-header"><h3>Delete Account</h3><button className="modal-close" onClick={() => setShowDelete(false)}>×</button></div>
-            <p style={{ marginBottom: 24, color: 'var(--color-slate)' }}>This will permanently delete your account and all your trips. This cannot be undone.</p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Delete Account</h3>
+              <button className="modal-close" onClick={() => setShowDelete(false)}>×</button>
+            </div>
+            <p style={{ margin: '16px 0' }}>Are you sure you want to delete your account? This action is permanent and will remove all your trips.</p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button className="btn btn-secondary" onClick={() => setShowDelete(false)}>Cancel</button>
-              <button className="btn btn-danger" onClick={handleDeleteAccount}>Delete Forever</button>
+              <button className="btn btn-danger" onClick={handleDeleteAccount}>Yes, Delete Everything</button>
             </div>
           </div>
         </div>
@@ -300,5 +331,9 @@ function ProfileContent() {
 }
 
 export default function ProfilePage() {
-  return <ToastProvider><ProfileContent /></ToastProvider>;
+  return (
+    <ToastProvider>
+      <ProfileContent />
+    </ToastProvider>
+  );
 }
