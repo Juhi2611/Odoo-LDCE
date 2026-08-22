@@ -1,22 +1,44 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import { getCurrentUser, initializeData, CITIES } from '@/lib/data';
-import { FiArrowRight, FiMapPin, FiStar, FiCalendar, FiUsers, FiSearch, FiArrowDown, FiX, FiCheck } from 'react-icons/fi';
+import { getCurrentUser, initializeData } from '@/lib/data';
+import { FiArrowRight, FiMapPin, FiStar, FiCalendar, FiUsers, FiSearch, FiArrowDown, FiHeart, FiPlay, FiAward, FiHeadphones, FiDollarSign, FiCompass, FiSun, FiDroplet, FiWind, FiCoffee } from 'react-icons/fi';
 import { MdFlight } from 'react-icons/md';
 import styles from './page.module.css';
 
 export default function LandingPage() {
   const router = useRouter();
   const [destinationSearch, setDestinationSearch] = useState('');
+  const [isVisible, setIsVisible] = useState({});
+  const observerRef = useRef(null);
 
   useEffect(() => {
     initializeData();
     const user = getCurrentUser();
     if (user) router.push('/dashboard');
   }, [router]);
+
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible((prev) => ({ ...prev, [entry.target.id]: true }));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    document.querySelectorAll('[data-animate]').forEach((el) => {
+      observerRef.current.observe(el);
+    });
+
+    return () => observerRef.current?.disconnect();
+  }, []);
 
   const featuredDestinations = [
     {
@@ -53,51 +75,68 @@ export default function LandingPage() {
     },
   ];
 
+  const featuredStays = [
+    {
+      name: 'Sunset Paradise Resort',
+      location: 'Bali, Indonesia',
+      image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
+      rating: '4.8',
+      price: '$320',
+      badge: 'Bestseller',
+    },
+    {
+      name: 'Alpine Lodge & Spa',
+      location: 'Zermatt, Switzerland',
+      image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800',
+      rating: '4.9',
+      price: '$450',
+      badge: 'Luxury',
+    },
+    {
+      name: 'Aegean Cliff Villa',
+      location: 'Santorini, Greece',
+      image: 'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=800',
+      rating: '4.7',
+      price: '$280',
+      badge: 'Popular',
+    },
+  ];
+
+  const experiences = [
+    { icon: <FiSun />, title: 'Infinity Pool', desc: 'Swim with a panoramic view' },
+    { icon: <FiDroplet />, title: 'Private Beach', desc: 'Feel the ocean breeze' },
+    { icon: <FiWind />, title: 'Sunset Lounge', desc: 'Unwind at golden hour' },
+    { icon: <FiCoffee />, title: 'Spa & Wellness', desc: 'Rejuvenate your body and mind' },
+  ];
+
   const features = [
     {
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16" />
-          <path d="M12 7v4" />
-          <path d="M12 15h.01" />
-        </svg>
-      ),
-      title: 'Handpicked Hotels',
-      desc: 'Stay at the finest places to relax.',
+      icon: <FiAward />,
+      title: 'Handpicked Stays',
+      desc: 'Premium properties selected for quality.',
     },
     {
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-      ),
-      title: 'Expert Guides',
-      desc: 'Local experts to guide your journey.',
+      icon: <FiCompass />,
+      title: 'Local Experiences',
+      desc: 'Discover authentic local adventures.',
     },
     {
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M16 8l-8 8" />
-          <path d="M8 8h8v8" />
-        </svg>
-      ),
-      title: 'Best Price Guarantee',
-      desc: 'We match the best prices for you.',
+      icon: <FiDollarSign />,
+      title: 'Best Price',
+      desc: 'Find competitive prices for your trip.',
     },
     {
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
-          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
-        </svg>
-      ),
+      icon: <FiHeadphones />,
       title: '24/7 Support',
-      desc: "We're here for you anytime, anywhere.",
+      desc: "We're here whenever you need us.",
     },
+  ];
+
+  const stats = [
+    { value: '10K+', label: 'Happy Travelers' },
+    { value: '150+', label: 'Premium Properties' },
+    { value: '24/7', label: 'Customer Support' },
+    { value: '4.8', label: 'Average Rating' },
   ];
 
   return (
@@ -113,23 +152,21 @@ export default function LandingPage() {
 
         <div className={styles.heroContent}>
           <div className={styles.timeTag}>
-            <span>It's time to</span>
-            <span className={styles.closeCross}>✕</span>
-            <MdFlight className={styles.planeGraphic} />
+            <span className={styles.tagPill}>✈ Travel Portal</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Explore<br />
-            the <span className={styles.goldText}>World</span>
-            <span className={styles.goldFlourish} />
+            Discover Places<br />
+            Worth <span className={styles.goldText}>Remembering</span>
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Discover breathtaking destinations, unforgettable experiences, and memories that last a lifetime.
+            Explore breathtaking destinations, unforgettable experiences, 
+            and create memories that last a lifetime.
           </p>
 
           <Link href="/auth/signup" className={styles.exploreBtn}>
-            Explore Now <span className={styles.btnArrowCircle}>→</span>
+            Explore Destinations <span className={styles.btnArrowCircle}>→</span>
           </Link>
         </div>
 
@@ -201,10 +238,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features Bar ────────────────────── */}
-      <section className={styles.featuresSection}>
+      <section className={styles.featuresSection} id="section-features" data-animate>
         <div className={`container ${styles.featuresGrid}`}>
           {features.map((f, i) => (
-            <div key={i} className={styles.featureItem}>
+            <div key={i} className={`${styles.featureItem} ${isVisible['section-features'] ? styles.fadeInUp : ''}`} style={{ animationDelay: `${i * 0.1}s` }}>
               <div className={styles.featureIconBox}>{f.icon}</div>
               <div>
                 <h4 className={styles.featureTitle}>{f.title}</h4>
@@ -216,9 +253,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── Popular Destinations ─────────────── */}
-      <section className={styles.destinationsSection}>
+      <section className={styles.destinationsSection} id="section-destinations" data-animate>
         <div className="container">
-          <span className={styles.goldSubhead}>EXPLORE THE BEST</span>
+          <span className={styles.goldSubhead}>EXPLORE THE WORLD</span>
           <div className={styles.destHeader}>
             <h2 className={styles.destTitle}>Popular Destinations</h2>
             <Link href="/explore" className={styles.viewAllBtn}>
@@ -228,7 +265,7 @@ export default function LandingPage() {
 
           <div className={styles.destGrid}>
             {featuredDestinations.map((dest, i) => (
-              <div key={i} className={styles.destCard} onClick={() => router.push('/auth/signup')}>
+              <div key={i} className={`${styles.destCard} ${isVisible['section-destinations'] ? styles.fadeInUp : ''}`} style={{ animationDelay: `${i * 0.12}s` }} onClick={() => router.push('/auth/signup')}>
                 <div className={styles.destImageWrap}>
                   <img src={dest.image} alt={dest.name} className={styles.destImage} />
                   
@@ -254,29 +291,134 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Featured Stays ─────────────────── */}
+      <section className={styles.staysSection} id="section-stays" data-animate>
+        <div className="container">
+          <span className={styles.goldSubhead}>CURATED FOR YOU</span>
+          <div className={styles.destHeader}>
+            <h2 className={styles.destTitle}>Featured Stays</h2>
+            <Link href="/explore" className={styles.viewAllBtn}>
+              Browse all stays <span className={styles.arrowCircle}>→</span>
+            </Link>
+          </div>
+
+          <div className={styles.staysGrid}>
+            {featuredStays.map((stay, i) => (
+              <div key={i} className={`${styles.stayCard} ${isVisible['section-stays'] ? styles.fadeInUp : ''}`} style={{ animationDelay: `${i * 0.12}s` }} onClick={() => router.push('/auth/signup')}>
+                <div className={styles.stayImageWrap}>
+                  <img src={stay.image} alt={stay.name} className={styles.stayImage} />
+                  <span className={styles.stayBadge}>{stay.badge}</span>
+                  <button className={styles.heartBtn} onClick={(e) => e.stopPropagation()}>
+                    <FiHeart />
+                  </button>
+                </div>
+                <div className={styles.stayInfo}>
+                  <h3 className={styles.stayName}>{stay.name}</h3>
+                  <p className={styles.stayLocation}>
+                    <FiMapPin /> {stay.location}
+                  </p>
+                  <div className={styles.stayMeta}>
+                    <span className={styles.stayRating}>
+                      <span className={styles.starYellow}>★</span> {stay.rating}
+                    </span>
+                    <span className={styles.stayPrice}>
+                      <strong>{stay.price}</strong> / night
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Experiences Section ──────────────── */}
+      <section className={styles.experiencesSection} id="section-experiences" data-animate>
+        <div className="container">
+          <div className={styles.expLayout}>
+            <div className={`${styles.expLeft} ${isVisible['section-experiences'] ? styles.fadeInLeft : ''}`}>
+              <span className={styles.goldSubhead}>RESORT EXPERIENCES</span>
+              <h2 className={styles.expTitle}>Unforgettable Moments Await</h2>
+              <p className={styles.expDesc}>
+                From infinity pools to private beaches, discover curated experiences that transform your journey into something truly extraordinary.
+              </p>
+
+              <div className={styles.expList}>
+                {experiences.map((exp, i) => (
+                  <div key={i} className={styles.expItem}>
+                    <div className={styles.expIconCircle}>{exp.icon}</div>
+                    <div>
+                      <h4 className={styles.expItemTitle}>{exp.title}</h4>
+                      <p className={styles.expItemDesc}>{exp.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Link href="/explore" className={styles.expCta}>
+                Explore All Experiences <FiArrowRight />
+              </Link>
+            </div>
+
+            <div className={`${styles.expRight} ${isVisible['section-experiences'] ? styles.fadeInRight : ''}`}>
+              <div className={styles.expMediaCard}>
+                <img 
+                  src="https://images.unsplash.com/photo-1540541338287-41700207dee6?w=900" 
+                  alt="Resort pool at sunset" 
+                  className={styles.expMainImage} 
+                />
+                <div className={styles.playOverlay}>
+                  <button className={styles.playBtn}>
+                    <FiPlay />
+                  </button>
+                </div>
+                <div className={styles.expThumbnails}>
+                  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300" alt="Beach" className={styles.expThumb} />
+                  <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=300" alt="Hotel" className={styles.expThumb} />
+                  <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=300" alt="Nature" className={styles.expThumb} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Promotional Banner ────────────────── */}
-      <section className={styles.offerSection}>
+      <section className={styles.offerSection} id="section-offer" data-animate>
         <div className={`container ${styles.offerBox}`}>
-          <div className={styles.offerContent}>
-            <span className={styles.offerLabel}>Limited Time Offer</span>
+          <div className={`${styles.offerContent} ${isVisible['section-offer'] ? styles.fadeInUp : ''}`}>
+            <span className={styles.offerLabel}>LIMITED TIME OFFER</span>
             <h2>
               Get up to <span className={styles.goldPercent}>30% OFF</span><br />
               on your next adventure
             </h2>
+            <p className={styles.offerDesc}>Book your dream getaway today and save big on premium properties, curated experiences, and luxury stays.</p>
             <Link href="/auth/signup" className={styles.offerBtn}>
               Explore Deals <span className={styles.arrowCircle}>→</span>
             </Link>
           </div>
 
           <div className={styles.offerImageWrap}>
-            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200" alt="Hiker in mountains" />
+            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200" alt="Mountain adventure" />
           </div>
 
           {/* Dotted Flight Arc Vector */}
           <svg className={styles.flightArc} viewBox="0 0 400 120" fill="none">
-            <path d="M10 100 Q150 10 380 40" stroke="rgba(255, 255, 255, 0.45)" strokeWidth="2" strokeDasharray="6 6" fill="none" />
+            <path d="M10 100 Q150 10 380 40" stroke="rgba(255, 255, 255, 0.35)" strokeWidth="2" strokeDasharray="6 6" fill="none" />
           </svg>
           <MdFlight className={styles.arcPlane} />
+        </div>
+      </section>
+
+      {/* ── Stats Section ─────────────────────── */}
+      <section className={styles.statsSection} id="section-stats" data-animate>
+        <div className={`container ${styles.statsGrid}`}>
+          {stats.map((stat, i) => (
+            <div key={i} className={`${styles.statItem} ${isVisible['section-stats'] ? styles.fadeInUp : ''}`} style={{ animationDelay: `${i * 0.1}s` }}>
+              <span className={styles.statValue}>{stat.value}</span>
+              <span className={styles.statLabel}>{stat.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
