@@ -149,7 +149,7 @@ function CommunityContent() {
 
                     <div className={styles.metaRow}>
                       <span><FiCalendar /> {trip.start_date && trip.end_date ? `${new Date(trip.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(trip.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'Flexible'}</span>
-                      <span><FiDollarSign /> ${trip.total_budget?.toLocaleString()} Est.</span>
+                      <span><FiDollarSign /> ₹{trip.total_budget?.toLocaleString('en-IN')} Est.</span>
                     </div>
 
                     <div className={styles.cardActions}>

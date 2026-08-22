@@ -131,8 +131,8 @@ function CreateTripContent() {
                     </div>
                   </div>
                   <div className="form-group">
-                    <label className="form-label"><FiDollarSign /> Total Budget (USD)</label>
-                    <input type="number" className="form-input" placeholder="e.g. 5000" value={form.total_budget} onChange={update('total_budget')} id="create-trip-budget" />
+                    <label className="form-label"><FiDollarSign /> Total Budget (₹ INR)</label>
+                    <input type="number" className="form-input" placeholder="e.g. 50000" value={form.total_budget} onChange={update('total_budget')} id="create-trip-budget" />
                   </div>
                 </div>
               )}

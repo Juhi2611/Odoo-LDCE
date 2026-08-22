@@ -16,7 +16,10 @@ export default function Navbar({ transparent = false }) {
   const router = useRouter();
 
   useEffect(() => {
-    setUser(getCurrentUser());
+    const syncUser = () => setUser(getCurrentUser());
+    syncUser();
+    window.addEventListener('storage', syncUser);
+    return () => window.removeEventListener('storage', syncUser);
   }, [pathname]);
 
   useEffect(() => {
@@ -34,11 +37,9 @@ export default function Navbar({ transparent = false }) {
 
   const navLinks = [
     { href: '/explore', label: 'Destinations' },
-    { href: '/explore', label: 'Experiences' },
-    { href: '/trips', label: 'My Trips' },
-    { href: '/community', label: 'Community' },
-    { href: '#deals', label: 'Deals' },
-    { href: '#about', label: 'About Us' },
+    { href: '/community', label: 'Community Feed' },
+    { href: '/trips', label: 'My Itineraries' },
+    { href: '/admin', label: 'Analytics' },
   ];
 
   const isTransparent = transparent && !scrolled;
@@ -53,7 +54,7 @@ export default function Navbar({ transparent = false }) {
           </div>
           <div>
             <span className={styles.logoText}>GlobeTrotter</span>
-            <span className={styles.logoTagline}>Explore Beyond Limits</span>
+            <span className={styles.logoTagline}>Personalized Travel Planning</span>
           </div>
         </Link>
 
@@ -88,13 +89,25 @@ export default function Navbar({ transparent = false }) {
         {/* Right Action Buttons */}
         <div className={styles.navActions}>
           {user ? (
-            <div className={styles.profileWrapper}>
+            <>
+              <Link href="/trips/create" className="btn btn-primary btn-sm" style={{ padding: '8px 18px', fontSize: '0.85rem' }}>
+                <FiPlusCircle /> Plan Trip
+              </Link>
+              <div className={styles.profileWrapper}>
               <button
                 className={styles.profileBtn}
                 onClick={() => setProfileOpen(!profileOpen)}
               >
                 <div className={styles.avatar}>
-                  {user.name?.charAt(0).toUpperCase()}
+                  {user.avatar_url ? (
+                    <img 
+                      src={user.avatar_url} 
+                      alt={user.name} 
+                      style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                    />
+                  ) : (
+                    user.name?.charAt(0).toUpperCase()
+                  )}
                 </div>
               </button>
               {profileOpen && (
@@ -122,13 +135,17 @@ export default function Navbar({ transparent = false }) {
                   </button>
                 </div>
               )}
-            </div>
-          ) : (
-            <>
-              <Link href="/auth/signup" className={`btn ${styles.contactBtn}`}>
-                Contact Us
-              </Link>
+              </div>
             </>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Link href="/auth/login" className="btn btn-secondary btn-sm" style={{ padding: '8px 18px', fontSize: '0.85rem' }}>
+                Sign In
+              </Link>
+              <Link href="/auth/signup" className="btn btn-primary btn-sm" style={{ padding: '8px 18px', fontSize: '0.85rem' }}>
+                Get Started
+              </Link>
+            </div>
           )}
 
           {/* Circle Hamburger Button */}

@@ -3,9 +3,11 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import { getCurrentUser, initializeData } from '@/lib/data';
-import { FiArrowRight, FiMapPin, FiStar, FiCalendar, FiUsers, FiSearch, FiArrowDown, FiHeart, FiPlay, FiAward, FiHeadphones, FiDollarSign, FiCompass, FiSun, FiDroplet, FiWind, FiCoffee } from 'react-icons/fi';
+import Globe3D from '@/components/Globe3D';
+import { getCurrentUser, initializeData, CITIES } from '@/lib/data';
+import { FiArrowRight, FiMapPin, FiStar, FiCalendar, FiUsers, FiSearch, FiArrowDown, FiHeart, FiPlay, FiAward, FiHeadphones, FiDollarSign, FiCompass, FiSun, FiDroplet, FiWind, FiCoffee, FiGlobe } from 'react-icons/fi';
 import { MdFlight } from 'react-icons/md';
+import { FaFacebookF, FaInstagram, FaYoutube, FaXTwitter } from 'react-icons/fa6';
 import styles from './page.module.css';
 
 export default function LandingPage() {
@@ -16,9 +18,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     initializeData();
-    const user = getCurrentUser();
-    if (user) router.push('/dashboard');
-  }, [router]);
+  }, []);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function LandingPage() {
       location: 'Bali, Indonesia',
       image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
       rating: '4.8',
-      price: '$320',
+      price: '₹24,500',
       badge: 'Bestseller',
     },
     {
@@ -89,7 +89,7 @@ export default function LandingPage() {
       location: 'Zermatt, Switzerland',
       image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800',
       rating: '4.9',
-      price: '$450',
+      price: '₹36,000',
       badge: 'Luxury',
     },
     {
@@ -97,7 +97,7 @@ export default function LandingPage() {
       location: 'Santorini, Greece',
       image: 'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=800',
       rating: '4.7',
-      price: '$280',
+      price: '₹22,000',
       badge: 'Popular',
     },
   ];
@@ -178,18 +178,29 @@ export default function LandingPage() {
         </div>
 
         {/* ── Search Bar Container ────────────── */}
-        <div className={styles.searchPanel}>
+        <form 
+          className={styles.searchPanel}
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (destinationSearch.trim()) {
+              router.push(`/explore?search=${encodeURIComponent(destinationSearch.trim())}`);
+            } else {
+              router.push('/explore');
+            }
+          }}
+        >
           <div className={styles.searchField}>
             <div className={styles.fieldHeader}>
               <FiMapPin className={styles.fieldIcon} />
               <div>
-                <label>Where to?</label>
+                <label htmlFor="landing-where-to">Where to?</label>
                 <input
+                  id="landing-where-to"
                   type="text"
-                  placeholder="Search destinations"
+                  placeholder="e.g. Goa, Tokyo, Paris"
                   value={destinationSearch}
                   onChange={(e) => setDestinationSearch(e.target.value)}
-                  onClick={() => router.push('/auth/signup')}
+                  autoComplete="off"
                 />
               </div>
             </div>
@@ -202,7 +213,12 @@ export default function LandingPage() {
               <FiCalendar className={styles.fieldIcon} />
               <div>
                 <label>Check in</label>
-                <input type="text" placeholder="Add dates" readOnly onClick={() => router.push('/auth/signup')} />
+                <input 
+                  type="text" 
+                  placeholder="Select date" 
+                  onFocus={(e) => e.target.type = 'date'}
+                  onBlur={(e) => { if (!e.target.value) e.target.type = 'text'; }}
+                />
               </div>
             </div>
           </div>
@@ -214,7 +230,12 @@ export default function LandingPage() {
               <FiCalendar className={styles.fieldIcon} />
               <div>
                 <label>Check out</label>
-                <input type="text" placeholder="Add dates" readOnly onClick={() => router.push('/auth/signup')} />
+                <input 
+                  type="text" 
+                  placeholder="Select date" 
+                  onFocus={(e) => e.target.type = 'date'}
+                  onBlur={(e) => { if (!e.target.value) e.target.type = 'text'; }}
+                />
               </div>
             </div>
           </div>
@@ -226,14 +247,54 @@ export default function LandingPage() {
               <FiUsers className={styles.fieldIcon} />
               <div>
                 <label>Travelers</label>
-                <input type="text" placeholder="Add guests" readOnly onClick={() => router.push('/auth/signup')} />
+                <input type="text" placeholder="2 Guests" defaultValue="2 Guests" />
               </div>
             </div>
           </div>
 
-          <button className={styles.searchSubmitBtn} onClick={() => router.push('/auth/signup')}>
+          <button 
+            type="submit" 
+            className={styles.searchSubmitBtn}
+            id="landing-search-btn"
+          >
             <span>Search</span> <FiSearch />
           </button>
+        </form>
+      </section>
+
+      {/* ── 3D Interactive Global Map Showcase ──────────────── */}
+      <section className={styles.globeSection} id="section-globe" data-animate>
+        <div className="container">
+          <div className={styles.globeContainerBox}>
+            <div className={styles.globeHeader}>
+              <div className={styles.tagPill} style={{ background: 'rgba(6, 182, 212, 0.15)', color: '#06B6D4', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
+                <FiGlobe /> 3D Interactive Visualizer
+              </div>
+              <h2>Explore the Globe in Real-Time 3D</h2>
+              <p>Spin the globe, click any glowing node to inspect popular destinations, budget scores, and jump straight into itinerary planning.</p>
+            </div>
+            
+            <div className={styles.globeComponentWrapper}>
+              <Globe3D onSelectCity={(cityName) => {
+                router.push(`/explore?search=${encodeURIComponent(cityName)}`);
+              }} />
+            </div>
+
+            <div className={styles.globeHighlights}>
+              <div className={styles.globeHighlightItem}>
+                <span className={styles.highlightNum}>25+</span>
+                <span className={styles.highlightLabel}>Curated Cities</span>
+              </div>
+              <div className={styles.globeHighlightItem}>
+                <span className={styles.highlightNum}>40+</span>
+                <span className={styles.highlightLabel}>Handpicked Activities</span>
+              </div>
+              <div className={styles.globeHighlightItem}>
+                <span className={styles.highlightNum}>100%</span>
+                <span className={styles.highlightLabel}>Live Budget Calculation</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -441,17 +502,17 @@ export default function LandingPage() {
         <div className={`container ${styles.footerGrid}`}>
           <div className={styles.footerBrand}>
             <div className={styles.footerLogo}>
-              <MdFlight className={styles.footerPlane} /> <strong>Roamora</strong>
+              <MdFlight className={styles.footerPlane} /> <strong>GlobeTrotter</strong>
             </div>
-            <p className={styles.tagline}>Explore Beyond Limits</p>
+            <p className={styles.tagline}>Empowering Personalized Travel Planning</p>
             <p className={styles.brandDesc}>
-              We help you discover the world with unforgettable travel experiences and exceptional service.
+              Dream, design, and organize multi-city adventures with ease. Intelligent itineraries, cost breakdowns, and global community sharing.
             </p>
             <div className={styles.socialIcons}>
-              <a href="#" className={styles.socialIcon}>f</a>
-              <a href="#" className={styles.socialIcon}>ig</a>
-              <a href="#" className={styles.socialIcon}>yt</a>
-              <a href="#" className={styles.socialIcon}>tw</a>
+              <a href="#" className={styles.socialIcon} aria-label="Facebook"><FaFacebookF /></a>
+              <a href="#" className={styles.socialIcon} aria-label="Instagram"><FaInstagram /></a>
+              <a href="#" className={styles.socialIcon} aria-label="YouTube"><FaYoutube /></a>
+              <a href="#" className={styles.socialIcon} aria-label="X (Twitter)"><FaXTwitter /></a>
             </div>
           </div>
 
@@ -459,23 +520,23 @@ export default function LandingPage() {
             <h4>Quick Links</h4>
             <Link href="/explore">Destinations</Link>
             <Link href="/explore">Experiences</Link>
-            <Link href="/trips">Hotels</Link>
-            <Link href="/trips">Tours</Link>
-            <Link href="/community">Deals</Link>
-            <Link href="/dashboard">About Us</Link>
+            <Link href="/trips">My Itineraries</Link>
+            <Link href="/community">Community Feed</Link>
+            <Link href="/trips/create">Plan Trip</Link>
+            <Link href="/dashboard">Dashboard</Link>
           </div>
 
           <div className={styles.footerCol}>
             <h4>Support</h4>
-            <a href="#">FAQs</a>
+            <a href="#">Help Center</a>
             <a href="#">Privacy Policy</a>
-            <a href="#">Terms & Conditions</a>
+            <a href="#">Terms of Service</a>
             <a href="#">Contact Us</a>
           </div>
 
           <div className={styles.footerCol}>
-            <h4>Newsletter</h4>
-            <p className={styles.newsletterDesc}>Subscribe to get exclusive travel deals and updates.</p>
+            <h4>Stay Connected</h4>
+            <p className={styles.newsletterDesc}>Get intelligent travel insights and destination recommendations.</p>
             <div className={styles.newsletterBox}>
               <input type="email" placeholder="Enter your email" />
               <button className={styles.newsSendBtn}>
@@ -487,7 +548,7 @@ export default function LandingPage() {
 
         <div className={styles.footerCopyright}>
           <div className="container">
-            <p>© 2026 Roamora. All rights reserved.</p>
+            <p>© 2026 GlobeTrotter. All rights reserved.</p>
           </div>
         </div>
       </footer>

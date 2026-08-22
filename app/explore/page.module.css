@@ -23,7 +23,7 @@
 
 /* Cities Grid */
 .cityGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); }
-.cityCard { border-radius: var(--radius-xl); overflow: hidden; cursor: pointer; animation: fadeInUp 0.5s ease-out both; transition: transform var(--transition-base), box-shadow var(--transition-base); }
+.cityCard { border-radius: var(--radius-xl); overflow: hidden; cursor: pointer; animation: fadeInUp 0.5s ease-out both; transition: transform var(--transition-base), box-shadow var(--transition-base); background: var(--color-white); }
 .cityCard:hover { transform: translateY(-6px); box-shadow: var(--shadow-xl); }
 .cityImageWrap { position: relative; aspect-ratio: 3/4; overflow: hidden; }
 .cityImageWrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
@@ -35,6 +35,23 @@
 .cityMeta { display: flex; justify-content: space-between; }
 .cityRating { display: flex; align-items: center; gap: 3px; font-size: 0.78rem; color: var(--color-gold-light); font-weight: 600; }
 .cityCost { font-size: 0.78rem; color: var(--color-gold-light); font-weight: 600; letter-spacing: 1px; }
+
+/* City Card Buttons - Fixed overflow */
+.cityActions {
+  padding: 12px 16px;
+  display: flex;
+  gap: 8px;
+  background: var(--color-white);
+}
+.cityActions .btn {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
 
 /* Activity Grid */
 .activityGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
@@ -48,17 +65,18 @@
 .actBody h4 { font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
 .actCity { font-size: 0.78rem; color: var(--color-forest); display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
 .actDesc { font-size: 0.82rem; color: var(--color-slate); line-height: 1.5; margin-bottom: 12px; }
-.actMeta { display: flex; gap: 14px; }
+.actMeta { display: flex; gap: 14px; flex-wrap: wrap; }
 .actMeta span { font-size: 0.78rem; color: var(--color-slate); display: flex; align-items: center; gap: 3px; }
 .actRating { color: var(--color-gold) !important; font-weight: 600; }
 
 /* Selected City Banner */
-.selectedCityBanner { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--color-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: var(--space-xl); }
+.selectedCityBanner { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--color-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: var(--space-xl); flex-wrap: wrap; }
 .selectedCityBanner img { width: 50px; height: 50px; border-radius: var(--radius-sm); object-fit: cover; }
-.bannerContent { flex: 1; }
+.bannerContent { flex: 1; min-width: 150px; }
 .bannerContent h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; }
 .bannerContent p { font-size: 0.8rem; color: var(--color-slate); }
 
+/* ── Responsive ── */
 @media (max-width: 1024px) {
   .cityGrid { grid-template-columns: repeat(3, 1fr); }
   .activityGrid { grid-template-columns: repeat(2, 1fr); }
@@ -68,6 +86,14 @@
   .activityGrid { grid-template-columns: 1fr; }
   .searchSection { flex-direction: column; }
   .searchBar { min-width: auto; }
+  .viewToggle { width: 100%; justify-content: center; }
+  .cityActions { flex-direction: column; }
+  .cityActions .btn { flex: none; width: 100%; }
+}
+@media (max-width: 480px) {
+  .cityGrid { grid-template-columns: 1fr; }
+  .filters { flex-direction: column; align-items: stretch; }
+  .filterSelect { width: 100%; }
 }
 
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

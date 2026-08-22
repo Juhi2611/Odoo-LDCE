@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { ToastProvider } from '@/components/Toast';
-import { getCurrentUser, getAnalytics, getTrips, CITIES } from '@/lib/data';
+import { getCurrentUser, getAnalytics, getTrips, CITIES, getCostTierLabel } from '@/lib/data';
 import { useRouter } from 'next/navigation';
 import { FiTrendingUp, FiUsers, FiMapPin, FiCompass, FiDollarSign, FiActivity, FiArrowUpRight, FiLayers, FiShield } from 'react-icons/fi';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
@@ -108,9 +108,9 @@ function AdminContent() {
                 <span className={styles.metricTitle}>Total Budget Planned</span>
                 <span className={styles.metricIcon} style={{ background: 'rgba(41, 128, 185, 0.1)', color: '#2980B9' }}><FiDollarSign /></span>
               </div>
-              <div className={styles.metricVal}>${analytics.totalBudget.toLocaleString()}</div>
+              <div className={styles.metricVal}>₹{analytics.totalBudget.toLocaleString('en-IN')}</div>
               <div className={styles.metricSub}>
-                Avg. ${(analytics.avgTripBudget || 0).toFixed(0)} per traveler
+                Avg. ₹{(analytics.avgTripBudget || 0).toLocaleString('en-IN')} per traveler
               </div>
             </div>
           </div>
@@ -198,7 +198,7 @@ function AdminContent() {
                         </td>
                         <td>{city.country}</td>
                         <td>
-                          <span className={styles.costBadge}>{'$'.repeat(city.cost_index)}</span>
+                          <span className={styles.costBadge}>{getCostTierLabel(city.cost_index)}</span>
                         </td>
                         <td>
                           <div className={styles.popBarWrap}>

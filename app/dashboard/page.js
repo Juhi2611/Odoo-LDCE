@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import { ToastProvider } from '@/components/Toast';
-import { getCurrentUser, getUserTrips, CITIES, calculateTripBudget, getCity } from '@/lib/data';
+import { getCurrentUser, getUserTrips, CITIES, calculateTripBudget, getCity, getCostTierLabel } from '@/lib/data';
 import { FiPlus, FiMapPin, FiCalendar, FiDollarSign, FiArrowRight, FiMap, FiStar, FiTrendingUp, FiCompass, FiGlobe } from 'react-icons/fi';
 import styles from './page.module.css';
 
@@ -23,118 +23,128 @@ export default function DashboardPage() {
   if (!user) return null;
 
   const upcomingTrips = trips.filter(t => t.status === 'upcoming');
-  const completedTrips = trips.filter(t => t.status === 'completed');
-  const totalBudget = trips.reduce((sum, t) => sum + (t.total_budget || 0), 0);
-  const totalCities = trips.reduce((sum, t) => sum + (t.stops?.length || 0), 0);
-  const recommendedCities = CITIES.sort((a, b) => b.popularity_score - a.popularity_score).slice(4, 10);
+  const pastTrips = trips.filter(t => t.status === 'completed');
+  const recommendedCities = CITIES.slice(0, 4);
 
-  const formatDate = (d) => {
-    if (!d) return '';
-    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  };
+  // Quick stats
+  const totalDestinations = trips.reduce((acc, t) => acc + (t.stops?.length || 0), 0);
+  const totalBudgetSpent = trips.reduce((acc, t) => {
+    const b = calculateTripBudget(t);
+    return acc + b.totalSpent;
+  }, 0);
 
   return (
-    <ToastProvider>
+    <>
       <Navbar />
-      <main className={styles.dashboard}>
+      <main className={styles.page}>
         <div className="container">
-          {/* Welcome Section */}
-          <section className={styles.welcome}>
-            <div className={styles.welcomeText}>
-              <span className="section-label">Welcome Back</span>
-              <h1>Hello, {user.name?.split(' ')[0]} 👋</h1>
-              <p>Ready to plan your next adventure? Here's your travel overview.</p>
+          {/* Welcome Header */}
+          <div className={styles.welcomeHeader}>
+            <div>
+              <span className="section-label">Travel Dashboard</span>
+              <h1>Welcome back, {user.name} 👋</h1>
+              <p>Ready to plan your next adventure? Here's an overview of your journeys.</p>
             </div>
-            <Link href="/trips/create" className="btn btn-primary btn-lg">
-              <FiPlus /> Plan New Trip
+            <Link href="/trips/create" className="btn btn-primary">
+              <FiPlus /> Create New Trip
             </Link>
-          </section>
+          </div>
 
-          {/* Stats Cards */}
-          <section className={styles.statsRow}>
-            {[
-              { icon: <FiMap />, label: 'Total Trips', value: trips.length, color: '#1B4332' },
-              { icon: <FiMapPin />, label: 'Cities Explored', value: totalCities, color: '#2D6A4F' },
-              { icon: <FiDollarSign />, label: 'Total Budget', value: `$${totalBudget.toLocaleString()}`, color: '#C4A35A' },
-              { icon: <FiTrendingUp />, label: 'Upcoming', value: upcomingTrips.length, color: '#2980B9' },
-            ].map((stat, i) => (
-              <div key={i} className={styles.statCard}>
-                <div className={styles.statIcon} style={{ background: `${stat.color}15`, color: stat.color }}>
-                  {stat.icon}
-                </div>
-                <div>
-                  <span className={styles.statValue}>{stat.value}</span>
-                  <span className={styles.statLabel}>{stat.label}</span>
-                </div>
+          {/* Stats Bar */}
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon} style={{ background: 'rgba(27,67,50,0.1)', color: 'var(--color-forest)' }}>
+                <FiMap />
               </div>
-            ))}
-          </section>
+              <div>
+                <span className={styles.statNumber}>{trips.length}</span>
+                <span className={styles.statLabel}>Total Trips</span>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon} style={{ background: 'rgba(196,163,90,0.15)', color: 'var(--color-gold-dark)' }}>
+                <FiMapPin />
+              </div>
+              <div>
+                <span className={styles.statNumber}>{totalDestinations}</span>
+                <span className={styles.statLabel}>Cities Visited</span>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon} style={{ background: 'rgba(41,128,185,0.1)', color: '#2980b9' }}>
+                <FiCalendar />
+              </div>
+              <div>
+                <span className={styles.statNumber}>{upcomingTrips.length}</span>
+                <span className={styles.statLabel}>Upcoming Trips</span>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon} style={{ background: 'rgba(46,204,113,0.1)', color: '#27ae60' }}>
+                <FiDollarSign />
+              </div>
+              <div>
+                <span className={styles.statNumber}>₹{totalBudgetSpent.toLocaleString('en-IN')}</span>
+                <span className={styles.statLabel}>Total Budget Spent</span>
+              </div>
+            </div>
+          </div>
 
-          {/* Upcoming Trips */}
+          {/* Active / Upcoming Trips */}
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
               <div>
-                <span className="section-label">Your Adventures</span>
-                <h2>Upcoming Trips</h2>
+                <span className="section-label">Your Itineraries</span>
+                <h2>Upcoming Journeys</h2>
               </div>
               <Link href="/trips" className={styles.seeAll}>
-                View All <FiArrowRight />
+                View All ({trips.length}) <FiArrowRight />
               </Link>
             </div>
 
             {upcomingTrips.length > 0 ? (
               <div className={styles.tripGrid}>
-                {upcomingTrips.map((trip, i) => {
+                {upcomingTrips.map(trip => {
                   const budget = calculateTripBudget(trip);
-                  const cities = trip.stops?.map(s => getCity(s.city_id)?.name).filter(Boolean).join(' → ');
+                  const firstCity = trip.stops?.length > 0 ? getCity(trip.stops[0].city_id) : null;
                   return (
-                    <Link href={`/trips/${trip.id}`} key={trip.id} className={styles.tripCard} style={{ animationDelay: `${i * 0.1}s` }}>
-                      <div className={styles.tripImageWrap}>
-                        <img src={trip.cover_image} alt={trip.name} className={styles.tripImage} />
-                        <div className={styles.tripBadge}>
-                          {trip.stops?.length || 0} {trip.stops?.length === 1 ? 'city' : 'cities'}
-                        </div>
+                    <Link href={`/trips/${trip.id}`} key={trip.id} className={styles.tripCard}>
+                      <div className={styles.tripCover}>
+                        <img 
+                          src={trip.cover_image || firstCity?.image_url || '/images/destinations/paris.jpg'} 
+                          alt={trip.name} 
+                          onError={(e) => { e.target.src = '/images/destinations/paris.jpg'; }}
+                        />
+                        <span className={`badge ${trip.status === 'upcoming' ? 'badge-forest' : 'badge-gold'} ${styles.tripBadge}`}>
+                          {trip.status}
+                        </span>
                       </div>
-                      <div className={styles.tripInfo}>
+                      <div className={styles.tripBody}>
                         <h3>{trip.name}</h3>
-                        {cities && <p className={styles.tripRoute}><FiMapPin /> {cities}</p>}
-                        <div className={styles.tripMeta}>
-                          <span><FiCalendar /> {formatDate(trip.start_date)} – {formatDate(trip.end_date)}</span>
-                          <span><FiDollarSign /> ${trip.total_budget?.toLocaleString()}</span>
-                        </div>
-                        <div className={styles.tripProgress}>
-                          <div className={styles.progressLabel}>
-                            <span>Budget Used</span>
-                            <span>{Math.round((budget.totalSpent / Math.max(budget.totalBudget, 1)) * 100)}%</span>
+                        <p className={styles.tripMeta}>
+                          <FiCalendar /> {trip.start_date ? new Date(trip.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No date'} — {trip.end_date ? new Date(trip.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No date'}
+                        </p>
+                        <p className={styles.tripStops}>
+                          <FiMapPin /> {trip.stops?.length || 0} destinations · {(trip.activities || []).length} activities
+                        </p>
+                        <div className={styles.tripBudget}>
+                          <div className={styles.budgetBarMini}>
+                            <div className="progress-bar-fill" style={{ width: `${Math.min((budget.totalSpent / Math.max(budget.totalBudget, 1)) * 100, 100)}%` }} />
                           </div>
-                          <div className="progress-bar">
-                            <div
-                              className={`progress-bar-fill ${budget.isOverBudget ? 'over-budget' : ''}`}
-                              style={{ width: `${Math.min((budget.totalSpent / Math.max(budget.totalBudget, 1)) * 100, 100)}%` }}
-                            />
-                          </div>
+                          <span>₹{budget.totalSpent.toLocaleString('en-IN')} of ₹{budget.totalBudget.toLocaleString('en-IN')}</span>
                         </div>
                       </div>
                     </Link>
                   );
                 })}
-
-                {/* Quick Add Card */}
-                <Link href="/trips/create" className={styles.addTripCard}>
-                  <div className={styles.addIcon}>
-                    <FiPlus />
-                  </div>
-                  <h3>Plan a New Trip</h3>
-                  <p>Start designing your next adventure</p>
-                </Link>
               </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-state-icon">🌍</div>
-                <h3>No Trips Yet</h3>
-                <p>Start planning your first adventure — it only takes a minute!</p>
-                <Link href="/trips/create" className="btn btn-primary">
-                  <FiPlus /> Create Your First Trip
+                <div className="empty-state-icon">✈️</div>
+                <h3>No upcoming trips yet</h3>
+                <p>Start planning your next adventure by creating a new trip itinerary.</p>
+                <Link href="/trips/create" className="btn btn-primary" style={{ marginTop: '16px' }}>
+                  <FiPlus /> Plan a Trip
                 </Link>
               </div>
             )}
@@ -155,15 +165,18 @@ export default function DashboardPage() {
             <div className={styles.recGrid}>
               {recommendedCities.map((city, i) => (
                 <Link href="/explore" key={city.id} className={styles.recCard} style={{ animationDelay: `${i * 0.08}s` }}>
-                  <img src={city.image_url} alt={city.name} />
+                  <img 
+                    src={city.image_url} 
+                    alt={city.name} 
+                    onError={(e) => { e.target.src = '/images/destinations/paris.jpg'; }}
+                  />
                   <div className={styles.recOverlay}>
                     <span className={styles.recCountry}>{city.country}</span>
                     <h4>{city.name}</h4>
                     <div className={styles.recMeta}>
                       <span><FiStar /> {(city.popularity_score / 20).toFixed(1)}</span>
                       <span className={styles.recCost}>
-                        {'$'.repeat(city.cost_index)}
-                        <span style={{ opacity: 0.3 }}>{'$'.repeat(5 - city.cost_index)}</span>
+                        {getCostTierLabel(city.cost_index)}
                       </span>
                     </div>
                   </div>
@@ -176,8 +189,9 @@ export default function DashboardPage() {
           <section className={styles.quickActions}>
             {[
               { icon: <FiCompass />, title: 'Explore Cities', desc: 'Discover 25+ destinations worldwide', href: '/explore' },
-              { icon: <FiMap />, title: 'My Trips', desc: 'View and manage all your trips', href: '/trips' },
-              { icon: <FiGlobe />, title: 'Community', desc: 'Browse shared travel plans', href: '/explore' },
+              { icon: <FiMap />, title: 'My Itineraries', desc: 'View and manage your travel plans', href: '/trips' },
+              { icon: <FiGlobe />, title: 'Community Feed', desc: 'Browse and clone shared travel plans', href: '/community' },
+              { icon: <FiTrendingUp />, title: 'Live Analytics', desc: 'System statistics and city trends', href: '/admin' },
             ].map((action, i) => (
               <Link key={i} href={action.href} className={styles.quickCard}>
                 <div className={styles.quickIcon}>{action.icon}</div>
@@ -189,6 +203,6 @@ export default function DashboardPage() {
           </section>
         </div>
       </main>
-    </ToastProvider>
+    </>
   );
 }

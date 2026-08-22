@@ -110,7 +110,7 @@ function TripsContent() {
                         <div className={styles.tripMetaRow}>
                           <span><FiCalendar /> {formatDate(trip.start_date)} – {formatDate(trip.end_date)}</span>
                           <span><FiMapPin /> {cities?.length || 0} cities</span>
-                          <span><FiDollarSign /> ${trip.total_budget?.toLocaleString()}</span>
+                          <span><FiDollarSign /> ₹{trip.total_budget?.toLocaleString('en-IN')}</span>
                         </div>
                         {cities && cities.length > 0 && (
                           <div className={styles.citiesRow}>

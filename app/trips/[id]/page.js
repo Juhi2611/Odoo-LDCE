@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import { ToastProvider, useToast } from '@/components/Toast';
-import { getCurrentUser, getTrip, updateTrip, getCity, getActivity, getCityActivities, addStop, removeStop, addTripActivity, removeTripActivity, addExpense, removeExpense, calculateTripBudget, CITIES, searchCities } from '@/lib/data';
-import { FiArrowLeft, FiPlus, FiTrash2, FiMapPin, FiCalendar, FiDollarSign, FiClock, FiStar, FiShare2, FiEdit3, FiList, FiGrid, FiBarChart2, FiExternalLink, FiX, FiSearch, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { getCurrentUser, getTrip, updateTrip, getCity, getActivity, getCityActivities, addStop, removeStop, addTripActivity, removeTripActivity, addExpense, removeExpense, calculateTripBudget, CITIES, searchCities, addCustomCity, getCostTierLabel } from '@/lib/data';
+import { FiArrowLeft, FiPlus, FiTrash2, FiMapPin, FiCalendar, FiDollarSign, FiClock, FiStar, FiShare2, FiEdit3, FiList, FiGrid, FiBarChart2, FiExternalLink, FiX, FiSearch, FiChevronDown, FiChevronUp, FiCheckCircle, FiAlertTriangle, FiGlobe, FiCompass, FiLoader } from 'react-icons/fi';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import styles from './page.module.css';
 
@@ -17,6 +17,9 @@ function TripDetailContent({ params }) {
   const [showAddActivity, setShowAddActivity] = useState(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [citySearch, setCitySearch] = useState('');
+  const [isVerifyingLocation, setIsVerifyingLocation] = useState(false);
+  const [verifiedLocation, setVerifiedLocation] = useState(null);
+  const [verificationError, setVerificationError] = useState(null);
   const [expandedStop, setExpandedStop] = useState(null);
   const [calendarView, setCalendarView] = useState('timeline');
   const router = useRouter();
@@ -34,6 +37,50 @@ function TripDetailContent({ params }) {
     setTrip(t);
     if (t.stops?.length > 0 && !expandedStop) setExpandedStop(t.stops[0].id);
   };
+
+  // Debounced Real-World Location Verification (Hook defined before any early returns)
+  useEffect(() => {
+    const q = citySearch.trim();
+    if (!q || q.length < 2) {
+      setVerifiedLocation(null);
+      setVerificationError(null);
+      setIsVerifyingLocation(false);
+      return;
+    }
+
+    const localMatches = searchCities(q);
+    if (localMatches.length > 0) {
+      setVerifiedLocation(null);
+      setVerificationError(null);
+      setIsVerifyingLocation(false);
+      return;
+    }
+
+    // No local matches found: initiate live external verification
+    setIsVerifyingLocation(true);
+    setVerificationError(null);
+    setVerifiedLocation(null);
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/places/search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        if (data.exists && data.city) {
+          setVerifiedLocation(data.city);
+          setVerificationError(null);
+        } else {
+          setVerifiedLocation(null);
+          setVerificationError(data.message || `"${q}" does not exist in the real world.`);
+        }
+      } catch (err) {
+        setVerificationError('Unable to connect to global geocoding network.');
+      } finally {
+        setIsVerifyingLocation(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [citySearch]);
 
   if (!trip) return null;
 
@@ -76,7 +123,13 @@ function TripDetailContent({ params }) {
   };
 
   // Add Stop Handler
-  const handleAddStop = (cityId) => {
+  const handleAddStop = (cityId, customCityData = null) => {
+    let targetCityId = cityId;
+    if (customCityData) {
+      const added = addCustomCity(customCityData);
+      targetCityId = added.id;
+    }
+
     const defaultStart = trip.stops?.length > 0
       ? trip.stops[trip.stops.length - 1].departure_date
       : trip.start_date;
@@ -86,7 +139,7 @@ function TripDetailContent({ params }) {
     endDate.setDate(endDate.getDate() + 3);
 
     addStop(trip.id, {
-      city_id: cityId,
+      city_id: targetCityId,
       arrival_date: startDate.toISOString().split('T')[0],
       departure_date: endDate.toISOString().split('T')[0],
       budget_allocated: 500,
@@ -94,7 +147,9 @@ function TripDetailContent({ params }) {
     loadTrip();
     setShowAddStop(false);
     setCitySearch('');
-    addToast('City added to itinerary!', 'success');
+    setVerifiedLocation(null);
+    setVerificationError(null);
+    addToast('Destination added to itinerary!', 'success');
   };
 
   // Add Activity Handler
@@ -172,7 +227,7 @@ function TripDetailContent({ params }) {
                   <span className={styles.dotSep}>•</span>
                   <FiMapPin /> {trip.stops?.length || 0} cities
                   <span className={styles.dotSep}>•</span>
-                  <FiDollarSign /> ${trip.total_budget?.toLocaleString()}
+                  <FiDollarSign /> ₹{trip.total_budget?.toLocaleString('en-IN')}
                 </p>
                 {trip.description && <p className={styles.tripDescText}>{trip.description}</p>}
               </div>
@@ -181,9 +236,9 @@ function TripDetailContent({ params }) {
             {/* Budget Bar */}
             <div className={styles.budgetBar}>
               <div className={styles.budgetInfo}>
-                <span>Budget: <strong>${budget.totalBudget.toLocaleString()}</strong></span>
-                <span>Spent: <strong>${budget.totalSpent.toLocaleString()}</strong></span>
-                <span>Remaining: <strong className={budget.isOverBudget ? styles.overBudget : styles.underBudget}>${Math.abs(budget.remaining).toLocaleString()}</strong></span>
+                <span>Budget: <strong>₹{budget.totalBudget.toLocaleString('en-IN')}</strong></span>
+                <span>Spent: <strong>₹{budget.totalSpent.toLocaleString('en-IN')}</strong></span>
+                <span>Remaining: <strong className={budget.isOverBudget ? styles.overBudget : styles.underBudget}>₹{Math.abs(budget.remaining).toLocaleString('en-IN')}</strong></span>
               </div>
               <div className="progress-bar" style={{ height: '10px' }}>
                 <div className={`progress-bar-fill ${budget.isOverBudget ? 'over-budget' : ''}`} style={{ width: `${Math.min((budget.totalSpent / Math.max(budget.totalBudget, 1)) * 100, 100)}%` }} />
@@ -255,7 +310,7 @@ function TripDetailContent({ params }) {
                                       <strong>{ta.activity?.name}</strong>
                                       <div className={styles.activityMeta}>
                                         <span><FiClock /> {ta.activity?.duration}</span>
-                                        <span><FiDollarSign /> ${ta.actual_cost}</span>
+                                        <span><FiDollarSign /> ₹{ta.actual_cost}</span>
                                         <span className="badge badge-forest">{ta.time_slot}</span>
                                       </div>
                                     </div>
@@ -318,7 +373,7 @@ function TripDetailContent({ params }) {
                         <Pie data={pieData} cx="50%" cy="50%" outerRadius={100} innerRadius={50} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                           {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                         </Pie>
-                        <Tooltip formatter={(v) => `$${v.toLocaleString()}`} />
+                        <Tooltip formatter={(v) => `₹${v.toLocaleString('en-IN')}`} />
                         <Legend />
                       </PieChart>
                     </ResponsiveContainer>
@@ -334,21 +389,21 @@ function TripDetailContent({ params }) {
                     {Object.entries(budget.byCategory).map(([cat, amount]) => (
                       <div key={cat} className={styles.summaryItem}>
                         <span>{cat}</span>
-                        <strong>${amount.toLocaleString()}</strong>
+                        <strong>₹{amount.toLocaleString('en-IN')}</strong>
                       </div>
                     ))}
                     <hr className="divider" />
                     <div className={styles.summaryItem}>
                       <strong>Total Spent</strong>
-                      <strong>${budget.totalSpent.toLocaleString()}</strong>
+                      <strong>₹{budget.totalSpent.toLocaleString('en-IN')}</strong>
                     </div>
                     <div className={styles.summaryItem}>
                       <span>Avg. per Day</span>
-                      <span>${budget.avgPerDay.toFixed(0)}/day</span>
+                      <span>₹{budget.avgPerDay.toLocaleString('en-IN', { maximumFractionDigits: 0 })}/day</span>
                     </div>
                     <div className={`${styles.summaryItem} ${budget.isOverBudget ? styles.overBudget : ''}`}>
                       <strong>{budget.isOverBudget ? 'Over Budget' : 'Remaining'}</strong>
-                      <strong>${Math.abs(budget.remaining).toLocaleString()}</strong>
+                      <strong>₹{Math.abs(budget.remaining).toLocaleString('en-IN')}</strong>
                     </div>
                   </div>
                 </div>
@@ -371,7 +426,7 @@ function TripDetailContent({ params }) {
                           <strong>{exp.description}</strong>
                           <span>{formatDate(exp.expense_date)}</span>
                         </div>
-                        <strong className={styles.expenseAmount}>${exp.amount.toLocaleString()}</strong>
+                        <strong className={styles.expenseAmount}>₹{exp.amount.toLocaleString('en-IN')}</strong>
                         <button className={styles.removeBtn} onClick={() => { removeExpense(trip.id, exp.id); loadTrip(); }}><FiX /></button>
                       </div>
                     ))}
@@ -424,7 +479,7 @@ function TripDetailContent({ params }) {
                               <div key={ta.id} className={styles.timelineActivity}>
                                 <span className="badge badge-forest">{ta.time_slot}</span>
                                 <strong>{ta.activity?.name}</strong>
-                                {ta.activity?.estimated_cost > 0 && <span className={styles.timelineCost}>${ta.actual_cost}</span>}
+                                {ta.activity?.estimated_cost > 0 && <span className={styles.timelineCost}>₹{ta.actual_cost?.toLocaleString('en-IN')}</span>}
                               </div>
                             ))
                           ) : (
@@ -479,23 +534,85 @@ function TripDetailContent({ params }) {
             </div>
             <div className={styles.modalSearch}>
               <FiSearch />
-              <input type="text" placeholder="Search cities..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} autoFocus />
+              <input 
+                type="text" 
+                placeholder="Search any global destination (e.g. Goa, Kyoto, Zurich)..." 
+                value={citySearch} 
+                onChange={(e) => setCitySearch(e.target.value)} 
+                autoFocus 
+              />
             </div>
             <div className={styles.cityResults}>
+              {/* 1. Local Database Matches */}
               {searchResults.map(city => (
                 <div key={city.id} className={styles.cityResultItem} onClick={() => handleAddStop(city.id)}>
-                  <img src={city.image_url} alt={city.name} />
+                  <img 
+                    src={city.image_url} 
+                    alt={city.name} 
+                    onError={(e) => { e.target.src = '/images/destinations/paris.jpg'; }}
+                  />
                   <div>
                     <strong>{city.name}</strong>
                     <span>{city.country} · {city.region}</span>
                   </div>
                   <div className={styles.cityMeta}>
                     <span><FiStar /> {(city.popularity_score / 20).toFixed(1)}</span>
-                    <span>{'$'.repeat(city.cost_index)}</span>
+                    <span style={{ fontWeight: 600, color: 'var(--color-forest)' }}>{getCostTierLabel(city.cost_index)}</span>
                   </div>
                   <button className="btn btn-primary btn-sm">Add</button>
                 </div>
               ))}
+
+              {/* 2. Verifying Real-World Location Spinner */}
+              {searchResults.length === 0 && isVerifyingLocation && (
+                <div className={styles.verifyingBox}>
+                  <FiLoader className="spin" style={{ fontSize: '1.4rem' }} />
+                  <div>
+                    <strong>Verifying "{citySearch}" with Satellite & Geocoding Data...</strong>
+                    <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.85 }}>Checking real-world coordinates and travel information.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* 3. Verified Real-World Destination Found */}
+              {searchResults.length === 0 && !isVerifyingLocation && verifiedLocation && (
+                <div className={styles.verifiedCard}>
+                  <div className={styles.verifiedBadge}>
+                    <FiCheckCircle /> Verified Real-World Destination
+                  </div>
+                  <div className={styles.verifiedHeader}>
+                    <img 
+                      src={verifiedLocation.image_url} 
+                      alt={verifiedLocation.name} 
+                      onError={(e) => { e.target.src = '/images/destinations/paris.jpg'; }}
+                    />
+                    <div className={styles.verifiedInfo}>
+                      <h4>{verifiedLocation.name}</h4>
+                      <span><FiMapPin /> {verifiedLocation.country} {verifiedLocation.state ? `(${verifiedLocation.state})` : ''} · {verifiedLocation.region}</span>
+                      <p>{verifiedLocation.description}</p>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--color-cream-dark)', paddingTop: '12px' }}>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--color-slate)' }}>
+                      <span>Lat: {verifiedLocation.latitude.toFixed(2)}°, Lon: {verifiedLocation.longitude.toFixed(2)}° · {getCostTierLabel(verifiedLocation.cost_index)}</span>
+                    </div>
+                    <button 
+                      className="btn btn-primary"
+                      onClick={() => handleAddStop(null, verifiedLocation)}
+                    >
+                      <FiPlus /> Add {verifiedLocation.name} to Trip
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Location Does Not Exist Error Message */}
+              {searchResults.length === 0 && !isVerifyingLocation && verificationError && (
+                <div className={styles.notFoundBox}>
+                  <h4><FiAlertTriangle /> Destination Not Found</h4>
+                  <p>{verificationError}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -525,7 +642,7 @@ function TripDetailContent({ params }) {
                         <div className={styles.actResultMeta}>
                           <span className="badge badge-forest">{act.category}</span>
                           <span><FiClock /> {act.duration}</span>
-                          <span><FiDollarSign /> ${act.estimated_cost}</span>
+                          <span><FiDollarSign /> ₹{act.estimated_cost}</span>
                           <span><FiStar /> {act.rating}</span>
                         </div>
                       </div>
@@ -562,7 +679,7 @@ function TripDetailContent({ params }) {
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Amount (USD)</label>
+                <label className="form-label">Amount (₹ INR)</label>
                 <input type="number" name="amount" className="form-input" placeholder="100" required min="0" step="0.01" />
               </div>
               <div className="form-group">

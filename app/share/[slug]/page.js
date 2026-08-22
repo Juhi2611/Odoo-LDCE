@@ -73,7 +73,7 @@ function ShareContent({ params }) {
           <p className={styles.coverMeta}>
             <span><FiCalendar /> {formatDate(trip.start_date)} – {formatDate(trip.end_date)}</span>
             <span><FiMapPin /> {trip.stops?.length || 0} destinations</span>
-            <span><FiDollarSign /> ${trip.total_budget?.toLocaleString()} budget</span>
+            <span><FiDollarSign /> ₹{trip.total_budget?.toLocaleString('en-IN')} budget</span>
           </p>
           {trip.description && <p className={styles.coverDesc}>{trip.description}</p>}
         </div>
@@ -102,10 +102,14 @@ function ShareContent({ params }) {
                     <div className={styles.actList}>
                       {acts.map(ta => (
                         <div key={ta.id} className={styles.actItem}>
-                          <img src={ta.activity?.image_url} alt={ta.activity?.name} />
+                          <img 
+                            src={ta.activity?.image_url || '/images/destinations/paris.jpg'} 
+                            alt={ta.activity?.name}
+                            onError={(e) => { e.target.src = '/images/destinations/paris.jpg'; }}
+                          />
                           <div>
                             <strong>{ta.activity?.name}</strong>
-                            <span><FiClock /> {ta.activity?.duration} · <FiDollarSign />${ta.actual_cost} · <FiStar /> {ta.activity?.rating}</span>
+                            <span><FiClock /> {ta.activity?.duration} · <FiDollarSign />₹{ta.actual_cost} · <FiStar /> {ta.activity?.rating}</span>
                           </div>
                         </div>
                       ))}
@@ -122,15 +126,15 @@ function ShareContent({ params }) {
         <div className={styles.budgetSummary}>
           <div className={styles.budgetItem}>
             <span>Total Budget</span>
-            <strong>${budget.totalBudget.toLocaleString()}</strong>
+            <strong>₹{budget.totalBudget.toLocaleString('en-IN')}</strong>
           </div>
           <div className={styles.budgetItem}>
             <span>Estimated Spending</span>
-            <strong>${budget.totalSpent.toLocaleString()}</strong>
+            <strong>₹{budget.totalSpent.toLocaleString('en-IN')}</strong>
           </div>
           <div className={styles.budgetItem}>
             <span>Avg. per Day</span>
-            <strong>${budget.avgPerDay.toFixed(0)}/day</strong>
+            <strong>₹{budget.avgPerDay.toLocaleString('en-IN', { maximumFractionDigits: 0 })}/day</strong>
           </div>
           <div className={styles.budgetItem}>
             <span>Duration</span>

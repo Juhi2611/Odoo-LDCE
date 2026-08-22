@@ -4,7 +4,9 @@
 .profileCard { background: var(--color-white); border-radius: var(--radius-2xl); padding: 32px; text-align: center; box-shadow: var(--shadow-card); position: sticky; top: calc(var(--nav-height) + 24px); height: fit-content; }
 .avatarSection { position: relative; display: inline-block; margin-bottom: 16px; }
 .avatarLarge { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--color-forest), var(--color-forest-light)); color: white; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 2.5rem; font-weight: 600; }
-.avatarEdit { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--color-white); border: 2px solid var(--color-cream-dark); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; color: var(--color-charcoal); }
+.avatarLargeImg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--color-forest); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.avatarEdit { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--color-forest); color: white; border: 2px solid var(--color-white); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: transform 0.2s ease; }
+.avatarEdit:hover { transform: scale(1.1); background: var(--color-forest-light); }
 .profileCard h2 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 4px; }
 .userEmail { font-size: 0.85rem; color: var(--color-slate); margin-bottom: 4px; }
 .userLocation { font-size: 0.85rem; color: var(--color-forest); display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 20px; }

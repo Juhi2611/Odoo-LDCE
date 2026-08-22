@@ -207,36 +207,41 @@
 }
 
 /* ── Search Bar Container ────────────── */
+/* ── Search Bar Container ────────────── */
 .searchPanel {
   position: absolute;
-  bottom: -48px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: -40px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   z-index: 25;
   background: var(--color-white);
   border-radius: var(--radius-full);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
-  padding: 12px 16px 12px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 4px 20px rgba(0, 0, 0, 0.06);
+  padding: 10px 14px 10px 24px;
   display: flex;
   align-items: center;
   max-width: 1080px;
   width: calc(100% - 48px);
-  border: 1px solid rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   animation: fadeInUp 0.8s ease 0.6s both;
+  box-sizing: border-box;
 }
 
 .searchField {
   flex: 1;
+  min-width: 0;
 }
 
 .fieldHeader {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 8px 12px;
   border-radius: var(--radius-md);
   transition: background 0.2s ease;
   cursor: pointer;
+  min-width: 0;
 }
 
 .fieldHeader:hover {
@@ -253,29 +258,33 @@
 .fieldHeader label {
   display: block;
   font-family: var(--font-display);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--color-charcoal);
   line-height: 1.2;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .fieldHeader input {
   border: none;
   background: transparent;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--color-slate);
   outline: none;
   width: 100%;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .searchDivider {
   width: 1px;
-  height: 40px;
+  height: 36px;
   background: var(--color-cream-dark);
-  margin: 0 6px;
+  margin: 0 4px;
   flex-shrink: 0;
 }
 
@@ -283,19 +292,20 @@
   background: var(--color-forest);
   color: #ffffff;
   border: none;
-  padding: 16px 32px;
+  padding: 14px 28px;
   border-radius: var(--radius-full);
   font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
   box-shadow: 0 6px 20px rgba(22, 51, 46, 0.2);
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .searchSubmitBtn:hover {
@@ -304,9 +314,111 @@
   box-shadow: 0 10px 28px rgba(22, 51, 46, 0.3);
 }
 
+/* ── 3D Interactive Globe Section ────────────────── */
+.globeSection {
+  padding: 100px 0 60px;
+  background: var(--color-cream-light);
+}
+
+.globeContainerBox {
+  background: linear-gradient(135deg, #07170E 0%, #0D2818 50%, #16422C 100%);
+  border-radius: var(--radius-xl);
+  padding: 60px 40px;
+  color: #ffffff;
+  box-shadow: 0 24px 60px rgba(7, 23, 14, 0.25), 0 0 40px rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.globeContainerBox::before {
+  content: '';
+  position: absolute;
+  top: -150px;
+  right: -150px;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.globeHeader {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 40px;
+}
+
+.globeHeader h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: #ffffff;
+  margin-top: 14px;
+  margin-bottom: 12px;
+}
+
+.globeHeader p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.globeComponentWrapper {
+  height: 480px;
+  width: 100%;
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.08) 0%, rgba(10, 14, 26, 0.6) 80%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.globeHighlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.globeHighlightItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.highlightNum {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+}
+
+.highlightLabel {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+  .globeContainerBox {
+    padding: 40px 20px;
+  }
+  .globeComponentWrapper {
+    height: 380px;
+  }
+  .globeHighlights {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
 /* ── Features Bar ────────────────────── */
 .featuresSection {
-  padding: 120px 0 72px;
+  padding: 80px 0 72px;
   background: var(--color-cream-light);
 }
 
@@ -442,8 +554,8 @@
 }
 
 .destCard:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 0 30px rgba(212, 175, 55, 0.15);
 }
 
 .destImageWrap {
@@ -961,7 +1073,7 @@
 /* ── Stats Section ───────────────────── */
 .statsSection {
   padding: 80px 0;
-  background: var(--color-cream-light);
+  background: linear-gradient(135deg, var(--color-forest-dark) 0%, var(--color-forest) 50%, var(--color-forest-light) 100%);
 }
 
 .statsGrid {
@@ -972,25 +1084,28 @@
 }
 
 .statItem {
-  padding: 32px 20px;
+  padding: 36px 20px;
   border-radius: var(--radius-xl);
-  background: var(--color-white);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .statItem:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2), 0 0 20px rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.3);
 }
 
 .statValue {
   display: block;
   font-family: var(--font-serif);
-  font-size: 2.4rem;
+  font-size: 2.6rem;
   font-weight: 700;
-  color: var(--color-forest);
+  color: var(--color-gold-light);
   margin-bottom: 8px;
   line-height: 1;
 }
@@ -999,7 +1114,7 @@
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-slate);
+  color: rgba(255, 255, 255, 0.8);
   letter-spacing: 0.3px;
 }
 
@@ -1203,6 +1318,7 @@
 }
 
 /* ── Responsive ──────────────────────── */
+/* ── Responsive ──────────────────────── */
 @media (max-width: 1024px) {
   .destGrid {
     grid-template-columns: repeat(2, 1fr);
@@ -1223,15 +1339,42 @@
   .footerGrid {
     grid-template-columns: 1fr 1fr;
   }
+  .searchPanel {
+    flex-wrap: wrap;
+    bottom: -60px;
+    border-radius: var(--radius-2xl);
+    padding: 16px 20px;
+    gap: 8px;
+  }
+  .searchDivider {
+    display: none;
+  }
+  .searchField {
+    flex: 1 1 40%;
+    min-width: 140px;
+  }
+  .searchSubmitBtn {
+    flex: 1 1 100%;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .featuresSection {
+    padding-top: 90px;
+  }
 }
 
 @media (max-width: 768px) {
   .searchPanel {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    margin: 24px auto -20px;
+    width: 100%;
     flex-direction: column;
-    bottom: -200px;
     border-radius: var(--radius-xl);
-    padding: 24px;
-    gap: 4px;
+    padding: 18px;
+    gap: 6px;
   }
   .searchDivider {
     display: none;
@@ -1245,7 +1388,7 @@
     margin-top: 8px;
   }
   .featuresSection {
-    padding-top: 240px;
+    padding-top: 48px;
   }
   .featuresGrid, .destGrid {
     grid-template-columns: 1fr;
@@ -1261,23 +1404,28 @@
     grid-template-columns: 1fr;
   }
   .heroContent {
-    padding-left: var(--space-xl);
-    padding-right: var(--space-xl);
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
   }
   .scrollIndicator {
     display: none;
   }
   .offerBox {
     min-height: 300px;
+    flex-direction: column;
   }
   .offerContent {
-    padding: 40px 28px;
+    padding: 36px 20px;
   }
   .offerImageWrap {
-    width: 40%;
-    opacity: 0.6;
+    width: 100%;
+    height: 200px;
+    position: relative;
+    opacity: 0.8;
   }
   .brandLogos {
-    gap: 24px;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }
