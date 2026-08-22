@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { getCurrentUser, logoutUser } from '@/lib/data';
+import { getCurrentUser, logoutUser, isAdminUser } from '@/lib/data';
 import { 
   FiMenu, 
   FiX, 
@@ -54,11 +54,13 @@ export default function Navbar({ transparent = false }) {
     router.push('/');
   };
 
+  const isAdmin = isAdminUser(user);
+
   const navLinks = [
     { href: '/explore', label: 'Destinations' },
     { href: '/community', label: 'Community Feed' },
     { href: '/trips', label: 'My Itineraries' },
-    { href: '/admin', label: 'Analytics' },
+    ...(isAdmin ? [{ href: '/admin', label: 'Analytics' }] : []),
   ];
 
   const isTransparent = transparent && !scrolled;
@@ -140,9 +142,11 @@ export default function Navbar({ transparent = false }) {
                     <Link href="/profile" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
                       <FiUser /> Profile & Settings
                     </Link>
-                    <Link href="/admin" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
-                      <FiBarChart2 /> Analytics
-                    </Link>
+                    {isAdmin && (
+                      <Link href="/admin" className={styles.dropdownItem} onClick={() => setProfileOpen(false)}>
+                        <FiBarChart2 style={{ color: 'var(--color-gold)' }} /> Live Analytics <span style={{ marginLeft: 'auto', fontSize: '0.68rem', background: 'var(--color-forest)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>ADMIN</span>
+                      </Link>
+                    )}
                     <hr className={styles.dropdownDivider} />
                     <button onClick={handleLogout} className={styles.dropdownItem}>
                       <FiLogOut /> Log Out
@@ -224,9 +228,11 @@ export default function Navbar({ transparent = false }) {
           <Link href="/profile" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
             <FiUser /> Profile & Saved Spots
           </Link>
-          <Link href="/admin" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
-            <FiBarChart2 /> Live Analytics
-          </Link>
+          {isAdmin && (
+            <Link href="/admin" className={styles.drawerLink} onClick={() => setDrawerOpen(false)}>
+              <FiBarChart2 style={{ color: 'var(--color-gold)' }} /> Live Analytics <span style={{ marginLeft: 'auto', fontSize: '0.68rem', background: 'var(--color-forest)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>ADMIN</span>
+            </Link>
+          )}
 
           <div style={{ marginTop: '12px', padding: '0 4px' }}>
             <Link 

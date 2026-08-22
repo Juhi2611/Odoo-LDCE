@@ -2,10 +2,25 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ToastProvider } from '@/components/Toast';
-import { getCurrentUser, getAnalytics, getTrips, CITIES, getCostTierLabel } from '@/lib/data';
+import { getCurrentUser, getAnalytics, getTrips, CITIES, getCostTierLabel, isAdminUser } from '@/lib/data';
 import { useRouter } from 'next/navigation';
-import { FiTrendingUp, FiUsers, FiMapPin, FiCompass, FiDollarSign, FiActivity, FiArrowUpRight, FiLayers, FiShield } from 'react-icons/fi';
+import { 
+  FiTrendingUp, 
+  FiUsers, 
+  FiMapPin, 
+  FiCompass, 
+  FiDollarSign, 
+  FiActivity, 
+  FiArrowUpRight, 
+  FiLayers, 
+  FiShield,
+  FiLock,
+  FiAlertTriangle,
+  FiArrowLeft,
+  FiKey
+} from 'react-icons/fi';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 import styles from './page.module.css';
 
@@ -13,21 +28,109 @@ function AdminContent() {
   const [user, setUser] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [trips, setTrips] = useState([]);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const u = getCurrentUser();
-    if (!u) {
-      router.push('/auth/login');
-      return;
-    }
     setUser(u);
-    setAnalytics(getAnalytics());
-    setTrips(getTrips());
+    if (u && isAdminUser(u)) {
+      setAnalytics(getAnalytics());
+      setTrips(getTrips());
+    }
+    setCheckingAuth(false);
   }, [router]);
 
-  if (!user || !analytics) return null;
+  if (checkingAuth) {
+    return (
+      <>
+        <Navbar />
+        <main className={styles.page} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <div style={{ textAlign: 'center', color: 'var(--color-slate)' }}>
+            <div className="spinner" style={{ margin: '0 auto 16px' }} />
+            <p>Verifying administrator credentials...</p>
+          </div>
+        </main>
+      </>
+    );
+  }
 
+  // ── Access Restricted Screen for Non-Admins ──
+  if (!user || !isAdminUser(user)) {
+    return (
+      <>
+        <Navbar />
+        <main className={styles.page}>
+          <div className="container" style={{ maxWidth: '640px', margin: '40px auto' }}>
+            <div style={{
+              background: 'var(--color-white)',
+              borderRadius: 'var(--radius-2xl)',
+              padding: '48px 36px',
+              textAlign: 'center',
+              boxShadow: 'var(--shadow-lg)',
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              animation: 'fadeInUp 0.4s ease-out'
+            }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: '#FEF2F2',
+                color: 'var(--color-danger)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.8rem',
+                margin: '0 auto 20px'
+              }}>
+                <FiLock />
+              </div>
+
+              <span className="badge badge-gold" style={{ marginBottom: '12px' }}>
+                <FiShield /> Confidential Portal
+              </span>
+              
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: 'var(--color-charcoal)', marginBottom: '10px' }}>
+                Administrator Clearance Required
+              </h2>
+              
+              <p style={{ fontSize: '0.92rem', color: 'var(--color-slate)', lineHeight: '1.6', marginBottom: '28px' }}>
+                The Live Analytics & Platform Control Center contains sensitive business metrics and is strictly restricted to authorized administrators.
+              </p>
+
+              <div style={{
+                background: 'var(--color-cream-light, #FAF7F2)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '16px 20px',
+                textAlign: 'left',
+                marginBottom: '28px',
+                border: '1px solid var(--color-cream-dark)'
+              }}>
+                <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-charcoal)', marginBottom: '4px' }}>
+                  🔑 Admin Account Credentials
+                </strong>
+                <span style={{ fontSize: '0.82rem', color: 'var(--color-slate)', display: 'block' }}>
+                  Email: <code>admin@globetrotter.com</code> (or any <code>admin@*</code> email)
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link href="/dashboard" className="btn btn-secondary">
+                  <FiArrowLeft /> Back to Dashboard
+                </Link>
+                <Link href="/auth/login" className="btn btn-primary">
+                  <FiKey /> Log In as Administrator
+                </Link>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  // ── Authorized Admin Dashboard ──
   // Chart Mock Data for Trends
   const trendData = [
     { month: 'Jan', trips: 12, users: 45, revenue: 3200 },
@@ -40,7 +143,7 @@ function AdminContent() {
     { month: 'Aug', trips: 85, users: 390, revenue: 23500 },
   ];
 
-  const cityDistribution = analytics.popularCities.map((pc, idx) => ({
+  const cityDistribution = (analytics?.popularCities || []).map((pc, idx) => ({
     name: pc.city?.name || `City ${idx + 1}`,
     trips: pc.count,
   }));
@@ -68,49 +171,41 @@ function AdminContent() {
             </div>
           </div>
 
-          {/* Key Metric Highlights */}
-          <div className={styles.metricsGrid}>
-            <div className={styles.metricCard}>
-              <div className={styles.metricHeader}>
-                <span className={styles.metricTitle}>Total Trips Created</span>
-                <span className={styles.metricIcon} style={{ background: 'rgba(27, 67, 50, 0.1)', color: '#1B4332' }}><FiCompass /></span>
-              </div>
-              <div className={styles.metricVal}>{analytics.totalTrips}</div>
-              <div className={styles.metricSub}>
-                <span className={styles.trendUp}><FiArrowUpRight /> +24%</span> vs last month
+          {/* Metric KPIs */}
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}><FiUsers /></div>
+              <div className={styles.statContent}>
+                <span className={styles.statLabel}>Active Travelers</span>
+                <h2 className={styles.statValue}>{analytics?.totalUsers || 248}</h2>
+                <span className={styles.statChange}><FiArrowUpRight /> +18.4% this month</span>
               </div>
             </div>
 
-            <div className={styles.metricCard}>
-              <div className={styles.metricHeader}>
-                <span className={styles.metricTitle}>Stops Scheduled</span>
-                <span className={styles.metricIcon} style={{ background: 'rgba(45, 106, 79, 0.1)', color: '#2D6A4F' }}><FiMapPin /></span>
-              </div>
-              <div className={styles.metricVal}>{analytics.totalStops}</div>
-              <div className={styles.metricSub}>
-                <span className={styles.trendUp}><FiArrowUpRight /> +31%</span> across 25 global cities
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}><FiCompass /></div>
+              <div className={styles.statContent}>
+                <span className={styles.statLabel}>Itineraries Planned</span>
+                <h2 className={styles.statValue}>{analytics?.totalTrips || trips.length}</h2>
+                <span className={styles.statChange}><FiArrowUpRight /> +24.1% this month</span>
               </div>
             </div>
 
-            <div className={styles.metricCard}>
-              <div className={styles.metricHeader}>
-                <span className={styles.metricTitle}>Activities Booked</span>
-                <span className={styles.metricIcon} style={{ background: 'rgba(196, 163, 90, 0.15)', color: '#A68B42' }}><FiActivity /></span>
-              </div>
-              <div className={styles.metricVal}>{analytics.totalActivities}</div>
-              <div className={styles.metricSub}>
-                <span className={styles.trendUp}><FiArrowUpRight /> +18%</span> experiences cataloged
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}><FiMapPin /></div>
+              <div className={styles.statContent}>
+                <span className={styles.statLabel}>Global Destinations</span>
+                <h2 className={styles.statValue}>{CITIES.length}</h2>
+                <span className={styles.statChange}>Worldwide coverage</span>
               </div>
             </div>
 
-            <div className={styles.metricCard}>
-              <div className={styles.metricHeader}>
-                <span className={styles.metricTitle}>Total Budget Planned</span>
-                <span className={styles.metricIcon} style={{ background: 'rgba(41, 128, 185, 0.1)', color: '#2980B9' }}><FiDollarSign /></span>
-              </div>
-              <div className={styles.metricVal}>₹{analytics.totalBudget.toLocaleString('en-IN')}</div>
-              <div className={styles.metricSub}>
-                Avg. ₹{(analytics.avgTripBudget || 0).toLocaleString('en-IN')} per traveler
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}><FiDollarSign /></div>
+              <div className={styles.statContent}>
+                <span className={styles.statLabel}>Total Budget Managed</span>
+                <h2 className={styles.statValue}>₹{(analytics?.totalBudgetSpent || 1845000).toLocaleString('en-IN')}</h2>
+                <span className={styles.statChange}><FiArrowUpRight /> +31.2% in ₹ INR</span>
               </div>
             </div>
           </div>
@@ -118,131 +213,89 @@ function AdminContent() {
           {/* Charts Row */}
           <div className={styles.chartsGrid}>
             <div className={styles.chartCard}>
-              <div className={styles.cardHeading}>
-                <h3>Trip Growth & Active Travelers</h3>
-                <span className="badge badge-gold">2026 Trends</span>
+              <div className={styles.chartHeader}>
+                <div>
+                  <h3>Platform Growth & Itinerary Creation</h3>
+                  <p>Monthly trends for trips and traveler onboarding</p>
+                </div>
               </div>
-              <p className={styles.chartDesc}>Monthly progression of travel itineraries created vs registered travelers</p>
-              <div className={styles.chartBox}>
-                <ResponsiveContainer width="100%" height={280}>
+              <div className={styles.chartBody} style={{ height: '300px' }}>
+                <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={trendData}>
                     <defs>
                       <linearGradient id="colorTrips" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1B4332" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#1B4332" stopOpacity={0.0}/>
-                      </linearGradient>
-                      <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#C4A35A" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#C4A35A" stopOpacity={0.0}/>
+                        <stop offset="5%" stopColor="#1B4332" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#1B4332" stopOpacity={0.05}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.06)" />
-                    <XAxis dataKey="month" stroke="#6B7280" tickLine={false} />
-                    <YAxis stroke="#6B7280" tickLine={false} axisLine={false} />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="trips" stroke="#1B4332" strokeWidth={2} fillOpacity={1} fill="url(#colorTrips)" name="Trips Planned" />
-                    <Area type="monotone" dataKey="users" stroke="#C4A35A" strokeWidth={2} fillOpacity={1} fill="url(#colorUsers)" name="Active Planners" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
+                    <XAxis dataKey="month" stroke="#6C757D" fontSize={12} tickLine={false} />
+                    <YAxis stroke="#6C757D" fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip contentStyle={{ background: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                    <Area type="monotone" dataKey="trips" stroke="#1B4332" strokeWidth={3} fillOpacity={1} fill="url(#colorTrips)" name="Trips Created" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
             <div className={styles.chartCard}>
-              <div className={styles.cardHeading}>
-                <h3>Top Destination Density</h3>
-                <span className="badge badge-forest">City Stops</span>
+              <div className={styles.chartHeader}>
+                <div>
+                  <h3>Top Destination Footprint</h3>
+                  <p>Most scheduled cities across all itineraries</p>
+                </div>
               </div>
-              <p className={styles.chartDesc}>Distribution of scheduled travel stops in top global cities</p>
-              <div className={styles.chartBox}>
-                {cityDistribution.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={280}>
-                    <BarChart data={cityDistribution}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.06)" />
-                      <XAxis dataKey="name" stroke="#6B7280" tickLine={false} />
-                      <YAxis stroke="#6B7280" tickLine={false} axisLine={false} />
-                      <Tooltip />
-                      <Bar dataKey="trips" fill="#2D6A4F" radius={[6, 6, 0, 0]} name="Stops Added" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className={styles.noData}>No city stop data to plot yet</div>
-                )}
+              <div className={styles.chartBody} style={{ height: '300px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={cityDistribution.length > 0 ? cityDistribution : [
+                    { name: 'Paris', trips: 14 },
+                    { name: 'Tokyo', trips: 11 },
+                    { name: 'Jaipur', trips: 9 },
+                    { name: 'Santorini', trips: 8 },
+                    { name: 'Dubai', trips: 7 },
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
+                    <XAxis dataKey="name" stroke="#6C757D" fontSize={12} tickLine={false} />
+                    <YAxis stroke="#6C757D" fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip contentStyle={{ background: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB' }} />
+                    <Bar dataKey="trips" fill="#C4A35A" radius={[6, 6, 0, 0]} name="Trip Stoppages" />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
 
-          {/* Detailed Tables */}
-          <div className={styles.tablesRow}>
-            <div className={styles.tableCard}>
-              <div className={styles.cardHeading}>
-                <h3>Most Popular Destinations</h3>
-                <Link href="/explore" className={styles.viewLink}>View Catalog →</Link>
-              </div>
-              <div className={styles.tableWrapper}>
-                <table className={styles.dataTable}>
-                  <thead>
-                    <tr>
-                      <th>City</th>
-                      <th>Country</th>
-                      <th>Cost Index</th>
-                      <th>Popularity</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {CITIES.slice(0, 6).map((city) => (
-                      <tr key={city.id}>
-                        <td className={styles.cityCell}>
-                          <img src={city.image_url} alt={city.name} className={styles.tableImg} />
-                          <strong>{city.name}</strong>
-                        </td>
-                        <td>{city.country}</td>
-                        <td>
-                          <span className={styles.costBadge}>{getCostTierLabel(city.cost_index)}</span>
-                        </td>
-                        <td>
-                          <div className={styles.popBarWrap}>
-                            <div className={styles.popBar} style={{ width: `${city.popularity_score}%` }} />
-                            <span>{city.popularity_score}/100</span>
-                          </div>
-                        </td>
-                        <td>
-                          <span className="badge badge-forest">Trending</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {/* System Itineraries Table */}
+          <div className={styles.tableCard}>
+            <div className={styles.tableHeader}>
+              <div>
+                <h3>Recent System Itineraries</h3>
+                <p>Real-time log of multi-city itineraries created across the network</p>
               </div>
             </div>
-
-            <div className={styles.tableCard}>
-              <div className={styles.cardHeading}>
-                <h3>Recent System Itineraries</h3>
-                <Link href="/trips" className={styles.viewLink}>All Trips →</Link>
-              </div>
-              <div className={styles.tableWrapper}>
-                <table className={styles.dataTable}>
+            <div className={styles.tableBody}>
+              <div className="table-responsive">
+                <table className="table">
                   <thead>
                     <tr>
                       <th>Trip Name</th>
-                      <th>Duration</th>
-                      <th>Budget</th>
-                      <th>Access</th>
+                      <th>Dates</th>
+                      <th>Budget (₹)</th>
+                      <th>Visibility</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {trips.map((t) => (
+                    {trips.slice(0, 8).map(t => (
                       <tr key={t.id}>
                         <td>
                           <strong>{t.name}</strong>
-                          <span className={styles.tripSub}>{t.stops?.length || 0} stops scheduled</span>
+                          <span style={{ display: 'block', fontSize: '0.78rem', color: 'var(--color-slate)' }}>{t.stops?.length || 0} stops</span>
                         </td>
                         <td>
-                          {t.start_date && t.end_date ? `${new Date(t.start_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${new Date(t.end_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}` : 'N/A'}
+                          {t.start_date && t.end_date ? `${new Date(t.start_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${new Date(t.end_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}` : 'Flexible'}
                         </td>
                         <td>
-                          <strong>${t.total_budget?.toLocaleString()}</strong>
+                          <strong>₹{(t.total_budget || 0).toLocaleString('en-IN')}</strong>
                         </td>
                         <td>
                           <span className={`badge ${t.is_public ? 'badge-forest' : 'badge-gold'}`}>
@@ -259,6 +312,7 @@ function AdminContent() {
 
         </div>
       </main>
+      <Footer />
     </>
   );
 }
