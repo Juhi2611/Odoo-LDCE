@@ -254,14 +254,16 @@ function ExploreContent() {
                     <button
                       className="btn btn-secondary btn-sm"
                       onClick={() => { setSelectedCity(city); setActiveView('activities'); }}
+                      title={`View activities in ${city.name}`}
                     >
-                      View Activities
+                      <FiCompass style={{ fontSize: '0.9rem' }} /> Activities
                     </button>
                     <button
                       className="btn btn-primary btn-sm"
                       onClick={() => setShowAddToTripModal({ type: 'city', item: city })}
+                      title={`Add ${city.name} to itinerary`}
                     >
-                      <FiPlus /> Add to Trip
+                      <FiPlus style={{ fontSize: '0.9rem' }} /> Add to Trip
                     </button>
                   </div>
                 </div>

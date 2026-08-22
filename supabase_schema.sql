@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url TEXT,
     city TEXT,
     country TEXT,
-    preferences JSONB DEFAULT '{"currency": "USD", "language": "en"}'::jsonb,
+    preferences JSONB DEFAULT '{"currency": "INR", "language": "en"}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
