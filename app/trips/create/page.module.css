@@ -2,9 +2,239 @@
 .backLink { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; color: var(--color-slate); margin: var(--space-lg) 0 var(--space-xl); transition: color var(--transition-fast); }
 .backLink:hover { color: var(--color-forest); }
 
-.createCard { background: var(--color-white); border-radius: var(--radius-2xl); box-shadow: var(--shadow-lg); max-width: 700px; margin: 0 auto; overflow: hidden; animation: fadeInUp 0.5s ease-out; }
+.createCard { background: var(--color-white); border-radius: var(--radius-2xl); box-shadow: var(--shadow-lg); max-width: 760px; margin: 0 auto; overflow: hidden; animation: fadeInUp 0.5s ease-out; border: 1px solid rgba(0,0,0,0.04); }
 
-/* Progress */
+/* Mode Switcher Tabs */
+.modeTabs {
+  display: flex;
+  background: var(--color-cream-light, #FAF7F2);
+  border-bottom: 1px solid var(--color-cream-dark);
+  padding: 8px;
+  gap: 8px;
+}
+
+.modeTab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: transparent;
+  color: var(--color-slate);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.activeModeTab {
+  background: var(--color-white);
+  color: var(--color-forest);
+  box-shadow: var(--shadow-sm);
+}
+
+.aiBadge {
+  background: linear-gradient(135deg, var(--color-gold), #e0a800);
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* AI Architect Panel */
+.aiPanel {
+  padding: 32px 40px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.aiHeader {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.aiHeader h2 {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: var(--color-charcoal);
+  margin-bottom: 6px;
+}
+
+.aiHeader p {
+  font-size: 0.92rem;
+  color: var(--color-slate);
+}
+
+/* Vibe Grid */
+.vibeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.vibeCard {
+  border: 1.5px solid var(--color-cream-dark);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  background: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+
+.vibeCard:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-2px);
+}
+
+.vibeSelected {
+  border-color: var(--color-forest) !important;
+  background: rgba(27, 67, 50, 0.03) !important;
+  box-shadow: 0 0 0 1px var(--color-forest);
+}
+
+.vibeIcon {
+  font-size: 1.6rem;
+  margin-bottom: 2px;
+}
+
+.vibeTitle {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+}
+
+.vibeDesc {
+  font-size: 0.75rem;
+  color: var(--color-slate);
+}
+
+/* AI Region Selector */
+.regionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.regionCard {
+  border: 1.5px solid var(--color-cream-dark);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  background: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.regionCard:hover {
+  border-color: var(--color-gold);
+}
+
+.regionSelected {
+  border-color: var(--color-forest) !important;
+  background: rgba(27, 67, 50, 0.04) !important;
+  font-weight: 600;
+}
+
+.regionFlag {
+  font-size: 1.4rem;
+}
+
+.regionInfo strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-charcoal);
+}
+
+.regionInfo span {
+  font-size: 0.72rem;
+  color: var(--color-slate);
+}
+
+/* AI Duration & Budget Grid */
+.aiInputsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.durationChips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.durationChip {
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-cream-dark);
+  background: var(--color-white);
+  font-size: 0.82rem;
+  color: var(--color-charcoal);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.durationChipSelected {
+  background: var(--color-forest);
+  color: white;
+  border-color: var(--color-forest);
+  font-weight: 600;
+}
+
+/* Loading Overlay */
+.aiLoadingOverlay {
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.aiSpinner {
+  width: 56px;
+  height: 56px;
+  border: 4px solid var(--color-cream-dark);
+  border-top-color: var(--color-forest);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+.aiLoadingText {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-forest);
+  margin-bottom: 8px;
+}
+
+.aiLoadingStep {
+  font-size: 0.85rem;
+  color: var(--color-slate);
+  min-height: 24px;
+}
+
+/* Manual Form Progress */
 .progress { display: flex; align-items: center; justify-content: center; gap: 60px; padding: 32px 40px 0; position: relative; }
 .progressStep { display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; }
 .progressDot { width: 40px; height: 40px; border-radius: 50%; background: var(--color-cream); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 0.9rem; font-weight: 600; color: var(--color-slate); transition: all var(--transition-base); }
@@ -44,10 +274,14 @@
 .actions { display: flex; gap: 12px; padding: 20px 40px 32px; border-top: 1px solid var(--color-cream-dark); }
 
 @media (max-width: 768px) {
-  .formContent, .actions { padding-left: 24px; padding-right: 24px; }
+  .formContent, .actions, .aiPanel { padding-left: 20px; padding-right: 20px; }
+  .vibeGrid { grid-template-columns: 1fr 1fr; }
+  .regionGrid { grid-template-columns: 1fr; }
+  .aiInputsGrid { grid-template-columns: 1fr; }
   .dateRow { grid-template-columns: 1fr; }
   .coverGrid { grid-template-columns: repeat(2, 1fr); }
   .progress { gap: 30px; padding: 24px 20px 0; }
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
