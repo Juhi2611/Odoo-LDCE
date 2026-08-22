@@ -181,9 +181,13 @@ GlobeTrotter is deployed live and globally accessible:
 
 ## 👥 Contributors & Hackathon Team
 
-- **Team**: Hackathon Finalists
+- **Team Members**:
+  - **JUHI VANJARA**
+  - **YASHVI SANGHVI**
+  - **SNEHI PATEL**
+  - **NANDISH PATEL**
 - **Project**: GlobeTrotter — Next-Gen Travel Planning Portal
-- **Hackathon**: Odoo Combined Hackathon 2026
+- **Hackathon**: Odoo X LDCE Virtual Hackathon 2026
 
 ---
 
