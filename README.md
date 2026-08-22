@@ -192,5 +192,5 @@ GlobeTrotter is deployed live and globally accessible:
 ---
 
 <div align="center">
-Made with ❤️ for global travelers.
+Made for global travelers.
 </div>
