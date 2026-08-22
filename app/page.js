@@ -547,8 +547,13 @@ export default function LandingPage() {
         </div>
 
         <div className={styles.footerCopyright}>
-          <div className="container">
-            <p>© 2026 GlobeTrotter. All rights reserved.</p>
+          <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+            <p style={{ margin: 0, fontSize: '0.85rem' }}>
+              © {new Date().getFullYear()} GlobeTrotter Portal Inc. All rights reserved. • <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>Terms of Service</span> • <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>Privacy Policy</span> • <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>Security</span>
+            </p>
+            <p style={{ margin: 0, fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.75)' }}>
+              🏆 Odoo X LDCE Virtual Hackathon 2026 • Team: <strong>JUHI VANJARA, YASHVI SANGHVI, SNEHI PATEL, NANDISH PATEL</strong>
+            </p>
           </div>
         </div>
       </footer>

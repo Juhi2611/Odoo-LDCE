@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ToastProvider, useToast } from '@/components/Toast';
 import { getCurrentUser, searchCities, searchActivities, getCityActivities, getCity, CITIES, getUserTrips, addStop, addTripActivity, addCustomCity, getAllCities, getCostTierLabel, getSavedCityIds, toggleSavedCity } from '@/lib/data';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -493,6 +494,8 @@ function ExploreContent() {
           </div>
         </div>
       )}
+
+      <Footer />
     </>
   );
 }

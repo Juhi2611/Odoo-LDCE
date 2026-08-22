@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ToastProvider } from '@/components/Toast';
 import {
   getCurrentUser,
@@ -216,6 +217,7 @@ export default function DashboardPage() {
           </section>
         </div>
       </main>
+      <Footer />
     </ToastProvider>
   );
 }

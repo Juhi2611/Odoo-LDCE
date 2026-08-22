@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ToastProvider, useToast } from '@/components/Toast';
 import { getCurrentUser, getTrips, getCity, copyTrip } from '@/lib/data';
 import { useRouter } from 'next/navigation';
@@ -178,6 +179,7 @@ function CommunityContent() {
 
         </div>
       </main>
+      <Footer />
     </>
   );
 }

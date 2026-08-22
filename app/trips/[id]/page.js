@@ -3,8 +3,9 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ToastProvider, useToast } from '@/components/Toast';
-import { getCurrentUser, getTrip, updateTrip, getCity, getActivity, getCityActivities, addStop, removeStop, addTripActivity, removeTripActivity, addExpense, removeExpense, calculateTripBudget, CITIES, searchCities, addCustomCity, getCostTierLabel } from '@/lib/data';
+import { getCurrentUser, getTrip, updateTrip, deleteTrip, getCity, getActivity, getCityActivities, addStop, removeStop, addTripActivity, removeTripActivity, addExpense, removeExpense, calculateTripBudget, CITIES, searchCities, addCustomCity, getCostTierLabel } from '@/lib/data';
 import { FiArrowLeft, FiPlus, FiTrash2, FiMapPin, FiCalendar, FiDollarSign, FiClock, FiStar, FiShare2, FiEdit3, FiList, FiGrid, FiBarChart2, FiExternalLink, FiX, FiSearch, FiChevronDown, FiChevronUp, FiCheckCircle, FiAlertTriangle, FiGlobe, FiCompass, FiLoader } from 'react-icons/fi';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import styles from './page.module.css';
@@ -16,6 +17,7 @@ function TripDetailContent({ params }) {
   const [showAddStop, setShowAddStop] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [citySearch, setCitySearch] = useState('');
   const [isVerifyingLocation, setIsVerifyingLocation] = useState(false);
   const [verifiedLocation, setVerifiedLocation] = useState(null);
@@ -206,6 +208,13 @@ function TripDetailContent({ params }) {
     addToast('Share link copied to clipboard!', 'success');
   };
 
+  // Delete Trip
+  const handleDeleteTrip = () => {
+    deleteTrip(trip.id);
+    addToast('Trip deleted successfully', 'success');
+    router.push('/trips');
+  };
+
   const searchResults = showAddStop ? searchCities(citySearch).slice(0, 8) : [];
 
   return (
@@ -259,6 +268,7 @@ function TripDetailContent({ params }) {
             ))}
             <div style={{ flex: 1 }} />
             <button className="btn btn-outline btn-sm" onClick={handleShare}><FiShare2 /> Share</button>
+            <button className="btn btn-danger btn-sm" onClick={() => setShowDeleteModal(true)} style={{ gap: '6px' }}><FiTrash2 /> Delete Trip</button>
           </div>
 
           {/* ── Itinerary Tab ── */}
@@ -695,6 +705,27 @@ function TripDetailContent({ params }) {
           </div>
         </div>
       )}
+
+      {/* Delete Trip Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-content animate-scale-in" onClick={e => e.stopPropagation()} style={{ maxWidth: '440px' }}>
+            <div className="modal-header">
+              <h3>Delete Trip</h3>
+              <button className="modal-close" onClick={() => setShowDeleteModal(false)}>×</button>
+            </div>
+            <p style={{ margin: '16px 0 24px', color: 'var(--color-slate)' }}>
+              Are you sure you want to delete <strong>&quot;{trip.name}&quot;</strong>? This action cannot be undone and will remove all associated itinerary stops and expenses.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="btn btn-danger" onClick={handleDeleteTrip}>Yes, Delete Trip</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer />
     </>
   );
 }

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ToastProvider, useToast } from '@/components/Toast';
 import { getCurrentUser, updateUser, logoutUser, getUserTrips, CITIES, getCity, getSavedCityIds } from '@/lib/data';
 import { FiUser, FiMail, FiMapPin, FiGlobe, FiSave, FiLogOut, FiTrash2, FiCamera, FiMap, FiCalendar, FiStar, FiHeart, FiUpload, FiX, FiCheck, FiCompass } from 'react-icons/fi';
@@ -326,6 +327,8 @@ function ProfileContent() {
           </div>
         </div>
       )}
+
+      <Footer />
     </>
   );
 }

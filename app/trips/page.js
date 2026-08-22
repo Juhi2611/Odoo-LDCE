@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ToastProvider, useToast } from '@/components/Toast';
 import { getCurrentUser, getUserTrips, deleteTrip, getCity, calculateTripBudget } from '@/lib/data';
 import { FiPlus, FiMapPin, FiCalendar, FiDollarSign, FiEdit3, FiTrash2, FiEye, FiSearch, FiFilter } from 'react-icons/fi';
@@ -169,6 +170,8 @@ function TripsContent() {
           </div>
         </div>
       )}
+
+      <Footer />
     </>
   );
 }
