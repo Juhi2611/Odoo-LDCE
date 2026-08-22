@@ -1,0 +1,73 @@
+.page { padding-top: calc(var(--nav-height) + 20px); padding-bottom: 80px; min-height: 100vh; }
+.header { padding: var(--space-2xl) 0 var(--space-lg); }
+.header h1 { margin-bottom: 8px; }
+.header p { font-size: 1.05rem; max-width: 600px; }
+
+/* Search */
+.searchSection { display: flex; gap: var(--space-md); margin-bottom: var(--space-lg); flex-wrap: wrap; }
+.searchBar { flex: 1; display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: var(--color-white); border-radius: var(--radius-full); box-shadow: var(--shadow-card); border: 1.5px solid rgba(0,0,0,0.06); min-width: 280px; transition: border-color var(--transition-fast); }
+.searchBar:focus-within { border-color: var(--color-forest); }
+.searchIcon { color: var(--color-slate); font-size: 1.1rem; flex-shrink: 0; }
+.searchBar input { flex: 1; border: none; background: none; font-size: 0.95rem; outline: none; color: var(--color-charcoal); font-family: var(--font-sans); }
+.clearBtn { background: var(--color-cream); border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--color-slate); font-size: 0.85rem; }
+
+.viewToggle { display: flex; gap: 4px; background: var(--color-white); border-radius: var(--radius-full); padding: 4px; box-shadow: var(--shadow-sm); }
+.viewBtn { display: flex; align-items: center; gap: 6px; padding: 12px 20px; font-family: var(--font-display); font-size: 0.88rem; font-weight: 500; border: none; background: transparent; border-radius: var(--radius-full); cursor: pointer; color: var(--color-slate); transition: all var(--transition-fast); }
+.activeView { background: var(--color-forest); color: var(--color-white); }
+
+/* Filters */
+.filters { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-xl); flex-wrap: wrap; }
+.filterSelect { padding: 10px 36px 10px 14px; font-size: 0.85rem; border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius-full); background: var(--color-white); color: var(--color-charcoal); cursor: pointer; font-family: var(--font-sans); appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%234A4A4A' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+.chipFilters { display: flex; gap: 6px; flex-wrap: wrap; }
+.resultCount { margin-left: auto; font-size: 0.82rem; color: var(--color-slate); }
+
+/* Cities Grid */
+.cityGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); }
+.cityCard { border-radius: var(--radius-xl); overflow: hidden; cursor: pointer; animation: fadeInUp 0.5s ease-out both; transition: transform var(--transition-base), box-shadow var(--transition-base); }
+.cityCard:hover { transform: translateY(-6px); box-shadow: var(--shadow-xl); }
+.cityImageWrap { position: relative; aspect-ratio: 3/4; overflow: hidden; }
+.cityImageWrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+.cityCard:hover .cityImageWrap img { transform: scale(1.06); }
+.cityBadge { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 4px; padding: 6px 12px; background: white; border-radius: var(--radius-full); font-size: 0.72rem; font-weight: 500; box-shadow: var(--shadow-sm); }
+.cityOverlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 16px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
+.cityOverlay h3 { font-family: var(--font-serif); font-size: 1.2rem; color: white; margin-bottom: 4px; }
+.cityOverlay p { font-size: 0.78rem; color: rgba(255,255,255,0.8); line-height: 1.4; margin-bottom: 8px; }
+.cityMeta { display: flex; justify-content: space-between; }
+.cityRating { display: flex; align-items: center; gap: 3px; font-size: 0.78rem; color: var(--color-gold-light); font-weight: 600; }
+.cityCost { font-size: 0.78rem; color: var(--color-gold-light); font-weight: 600; letter-spacing: 1px; }
+
+/* Activity Grid */
+.activityGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+.activityCard { background: var(--color-white); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-card); border: 1px solid rgba(0,0,0,0.03); transition: all var(--transition-base); animation: fadeInUp 0.5s ease-out both; }
+.activityCard:hover { transform: translateY(-4px); box-shadow: var(--shadow-card-hover); }
+.actImgWrap { position: relative; height: 180px; overflow: hidden; }
+.actImgWrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.activityCard:hover .actImgWrap img { transform: scale(1.06); }
+.actCategoryBadge { position: absolute; top: 12px; left: 12px; }
+.actBody { padding: 18px; }
+.actBody h4 { font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+.actCity { font-size: 0.78rem; color: var(--color-forest); display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.actDesc { font-size: 0.82rem; color: var(--color-slate); line-height: 1.5; margin-bottom: 12px; }
+.actMeta { display: flex; gap: 14px; }
+.actMeta span { font-size: 0.78rem; color: var(--color-slate); display: flex; align-items: center; gap: 3px; }
+.actRating { color: var(--color-gold) !important; font-weight: 600; }
+
+/* Selected City Banner */
+.selectedCityBanner { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--color-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: var(--space-xl); }
+.selectedCityBanner img { width: 50px; height: 50px; border-radius: var(--radius-sm); object-fit: cover; }
+.bannerContent { flex: 1; }
+.bannerContent h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; }
+.bannerContent p { font-size: 0.8rem; color: var(--color-slate); }
+
+@media (max-width: 1024px) {
+  .cityGrid { grid-template-columns: repeat(3, 1fr); }
+  .activityGrid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .cityGrid { grid-template-columns: repeat(2, 1fr); }
+  .activityGrid { grid-template-columns: 1fr; }
+  .searchSection { flex-direction: column; }
+  .searchBar { min-width: auto; }
+}
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

@@ -1,0 +1,53 @@
+.page { padding-top: calc(var(--nav-height) + 20px); padding-bottom: 80px; min-height: 100vh; }
+.backLink { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; color: var(--color-slate); margin: var(--space-lg) 0 var(--space-xl); transition: color var(--transition-fast); }
+.backLink:hover { color: var(--color-forest); }
+
+.createCard { background: var(--color-white); border-radius: var(--radius-2xl); box-shadow: var(--shadow-lg); max-width: 700px; margin: 0 auto; overflow: hidden; animation: fadeInUp 0.5s ease-out; }
+
+/* Progress */
+.progress { display: flex; align-items: center; justify-content: center; gap: 60px; padding: 32px 40px 0; position: relative; }
+.progressStep { display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; }
+.progressDot { width: 40px; height: 40px; border-radius: 50%; background: var(--color-cream); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 0.9rem; font-weight: 600; color: var(--color-slate); transition: all var(--transition-base); }
+.activeStep .progressDot { background: var(--color-forest); color: var(--color-white); }
+.progressStep span { font-size: 0.8rem; color: var(--color-slate); font-weight: 500; }
+.activeStep span { color: var(--color-forest); }
+.progressLine { position: absolute; top: 52px; left: 25%; right: 25%; height: 3px; background: var(--color-cream-dark); border-radius: 2px; z-index: 1; }
+.progressFill { height: 100%; background: var(--color-forest); border-radius: 2px; transition: width var(--transition-smooth); }
+
+.formContent { padding: 32px 40px; }
+.stepContent { animation: fadeIn 0.3s ease-out; }
+.stepHeader { margin-bottom: var(--space-2xl); }
+.stepHeader h2 { margin-bottom: 6px; }
+.stepHeader p { font-size: 0.95rem; }
+.dateRow { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); }
+
+/* Cover Grid */
+.coverGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.coverOption { position: relative; border: 3px solid transparent; border-radius: var(--radius-md); overflow: hidden; cursor: pointer; background: none; padding: 0; aspect-ratio: 16/10; transition: all var(--transition-fast); }
+.coverOption img { width: 100%; height: 100%; object-fit: cover; }
+.coverOption:hover { border-color: var(--color-cream-dark); }
+.coverSelected { border-color: var(--color-forest) !important; }
+.coverCheck { position: absolute; inset: 0; background: rgba(27,67,50,0.4); display: flex; align-items: center; justify-content: center; color: var(--color-white); font-size: 1.5rem; }
+
+/* Checkbox */
+.checkboxLabel { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 16px; border-radius: var(--radius-md); border: 1.5px solid var(--color-cream-dark); transition: all var(--transition-fast); }
+.checkboxLabel:hover { border-color: var(--color-forest); background: rgba(27,67,50,0.02); }
+.checkboxLabel input { display: none; }
+.checkmark { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--color-cream-dark); flex-shrink: 0; margin-top: 2px; transition: all var(--transition-fast); display: flex; align-items: center; justify-content: center; }
+.checkboxLabel input:checked ~ .checkmark { background: var(--color-forest); border-color: var(--color-forest); }
+.checkboxLabel input:checked ~ .checkmark::after { content: '✓'; color: white; font-size: 0.8rem; }
+.checkboxLabel strong { font-family: var(--font-display); font-size: 0.95rem; display: block; margin-bottom: 2px; }
+.checkboxLabel p { font-size: 0.82rem; color: var(--color-slate); margin: 0; }
+
+.error { padding: 12px 16px; background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--radius-md); color: var(--color-danger); font-size: 0.88rem; margin-bottom: 20px; }
+
+.actions { display: flex; gap: 12px; padding: 20px 40px 32px; border-top: 1px solid var(--color-cream-dark); }
+
+@media (max-width: 768px) {
+  .formContent, .actions { padding-left: 24px; padding-right: 24px; }
+  .dateRow { grid-template-columns: 1fr; }
+  .coverGrid { grid-template-columns: repeat(2, 1fr); }
+  .progress { gap: 30px; padding: 24px 20px 0; }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
